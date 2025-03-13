@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5036886469027041186
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5168469558451885226}
+  - component: {fileID: 1011669681940667211}
+  m_Layer: 0
+  m_Name: Random Coins
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5168469558451885226
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5036886469027041186}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1011669681940667211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5036886469027041186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ba30df4afbae294db081db14d48d3aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coinPrefabs:
+  - {fileID: 8901338763266175865, guid: 173a63fa3c48c0e4c9a4db1696de361e, type: 3}
+  - {fileID: 8936325105785966958, guid: c7bf4f4feabfe794890c19e2d8576b9b, type: 3}
+  - {fileID: 8901338763266175865, guid: 25c1ab25b049a634092bdc6fae8e95b5, type: 3}
+  - {fileID: 8936325105785966958, guid: 98e9ce9e3ee53bf4fba3033bae5149eb, type: 3}
+  - {fileID: 8901338763266175865, guid: 10fddfe6d550cf3439025d617b3ae0d7, type: 3}
+  - {fileID: 8936325105785966958, guid: a36291dcb4474d041b095f40e3fb9ebb, type: 3}
+  - {fileID: 8901338763266175865, guid: 54bdda8c6ba840b47ab52448a7b27490, type: 3}
+  - {fileID: 8901338763266175865, guid: ecd51b3b189f205459b64fd1d270a0e9, type: 3}
+  - {fileID: 8901338763266175865, guid: 8aaa35ff62bbfbe43b9ec74ddfd6938d, type: 3}
+  appearanceRate: 0.8

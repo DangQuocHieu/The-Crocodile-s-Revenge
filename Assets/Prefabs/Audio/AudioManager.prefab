@@ -1,0 +1,109 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2922437448658071822
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5520295799416386234}
+  - component: {fileID: 9201634856442691743}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5520295799416386234
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2922437448658071822}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9201634856442691743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2922437448658071822}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb03ee2c8ba36ee47867efe4bb5d0fab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioMixer: {fileID: 24100000, guid: 0d95a2efde9204648b263ad4b370af28, type: 2}
+  sfxAudios:
+  - audioName: 2
+    clip: {fileID: 8300000, guid: 287d965f2038f57459b49521b1171258, type: 3}
+    volume: 0.6
+    pitch: 1
+    priority: 128
+  - audioName: 3
+    clip: {fileID: 8300000, guid: e649ae401554b504e93d0de5fb4bb6d8, type: 3}
+    volume: 1
+    pitch: 1
+    priority: 128
+  - audioName: 4
+    clip: {fileID: 8300000, guid: aabbc607a206091478e95889702c064b, type: 3}
+    volume: 1
+    pitch: 1
+    priority: 128
+  - audioName: 6
+    clip: {fileID: 8300000, guid: fa857f67eb97ee046ba4d7d51b1d41ae, type: 3}
+    volume: 1
+    pitch: 1
+    priority: 128
+  - audioName: 5
+    clip: {fileID: 8300000, guid: 0811dfe93290c6548bb78ec9866b98cf, type: 3}
+    volume: 1
+    pitch: 1
+    priority: 128
+  - audioName: 7
+    clip: {fileID: 8300000, guid: f7ad20110ee98624093d251f5bc43cae, type: 3}
+    volume: 1
+    pitch: 1
+    priority: 128
+  - audioName: 8
+    clip: {fileID: 8300000, guid: cca7bcf46cf75784386f382b81cf0642, type: 3}
+    volume: 1
+    pitch: 1
+    priority: 128
+  - audioName: 9
+    clip: {fileID: 8300000, guid: fafe7a907c25a0842abf4e9355348612, type: 3}
+    volume: 1
+    pitch: 1
+    priority: 128
+  - audioName: 11
+    clip: {fileID: 8300000, guid: 487b094c090cc56458ff57b12748fd33, type: 3}
+    volume: 1
+    pitch: 1
+    priority: 128
+  - audioName: 10
+    clip: {fileID: 8300000, guid: fccf0a365d03de54faf29fb9371d0e77, type: 3}
+    volume: 1
+    pitch: 1
+    priority: 128
+  musicAudios:
+  - audioName: 0
+    clip: {fileID: 8300000, guid: 68d8ab6a593175949aad46f7c1c8152f, type: 3}
+    volume: 1
+    pitch: 1
+    priority: 128
+  - audioName: 1
+    clip: {fileID: 8300000, guid: 7d436e41cbfff6b4097398fd3a919c79, type: 3}
+    volume: 1
+    pitch: 1
+    priority: 128

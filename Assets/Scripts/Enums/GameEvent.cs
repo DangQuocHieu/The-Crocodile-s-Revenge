@@ -1,0 +1,23 @@
+public enum GameEvent
+{
+    OnObstacleHitPlayer,
+    OnPlayerPickupTripleJumpPowerUp,
+    OnPlayerHurt,
+    OnPlayerPickUpPowerup,
+    OnPlayerPickUpShieldPowerUp,
+    OnPlayerPickUpCoin,
+    OnPlayerPickUpDoubleCoinPowerUp,
+    OnPlayerPickUpMagnetPowerUp,
+    OnPowerdown,
+    OnGameDifficultyIncreasing,
+    OnGameStart,
+    OnGamePaused,
+    OnGameOver,
+    OnGameResume,
+    OnGameRestart,
+    OnGobackToHomeScreen,
+    OnUpdateHealthUI,
+    OnUpdateGameStatisticUI,
+    OnPlayerJump,
+    OnPlayerMultipleJump
+}
