@@ -8,10 +8,9 @@ public class UpgardeScreenController : UIScreen
 {
     [SerializeField] Button backButton;
     
-    protected override void Awake()
+    protected void Awake()
     {
         backButton.onClick.AddListener(() => { ScreenManager.Instance.GoBack(); });
-        base.Awake();
     }
 
     public override Tweener Show()

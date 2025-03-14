@@ -12,16 +12,16 @@ public class HomeScreenController : UIScreen
     [SerializeField] private Button upgradeButton;
     [SerializeField] private Button exitButton;
 
-    protected override void Awake()
+    private void Awake()
     {
         playButton.onClick.AddListener(StartGame);
         settingButton.onClick.AddListener(() => { ScreenManager.Instance.TransitionTo(ScreenID.SettingScreen); });
         upgradeButton.onClick.AddListener(() => { ScreenManager.Instance.TransitionTo(ScreenID.UpgradeScreen); });
-        base.Awake();
     }
     void StartGame()
     {
         Observer.Notify(GameEvent.OnGameStart);
+        Time.timeScale = 1;
         UITransitionController.SlideAndScaleTransition(async() =>
         {
             await SceneManager.LoadSceneAsync("Game Scene");

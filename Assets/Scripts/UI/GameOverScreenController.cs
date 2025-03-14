@@ -11,8 +11,8 @@ public class GameOverScreenController : UIScreen
     [SerializeField] TextMeshProUGUI totalDistanceText;
     [SerializeField] TextMeshProUGUI gameTimeText;
 
-    private RectTransform rectTransform;
-    protected override void Awake()
+    RectTransform rectTransform;
+    private void Awake()
     {
         restartButton.onClick.AddListener(() => {
             Observer.Notify(GameEvent.OnGameRestart);
@@ -20,15 +20,12 @@ public class GameOverScreenController : UIScreen
         returnToTilescreenButton.onClick.AddListener(() => {
             Observer.Notify(GameEvent.OnGobackToHomeScreen);
         });
-
-        rectTransform = GetComponent<RectTransform>();  
-        base.Awake();
+        rectTransform = gameObject.GetComponent<RectTransform>();
     }
 
     public override Tweener Hide()
     {
         UIAnimationController.Slide(rectTransform, isIn: false).OnComplete(() => { gameObject.SetActive(false); });
-
         return null;
     }
 

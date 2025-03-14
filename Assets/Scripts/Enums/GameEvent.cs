@@ -19,5 +19,7 @@ public enum GameEvent
     OnUpdateHealthUI,
     OnUpdateGameStatisticUI,
     OnPlayerJump,
-    OnPlayerMultipleJump
+    OnPlayerMultipleJump,
+    OnPlayerBeginRevive,
+    OnPlayerFinishRevive
 }

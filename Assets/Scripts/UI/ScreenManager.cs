@@ -1,5 +1,6 @@
 ﻿using DG.Tweening;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
@@ -20,16 +21,15 @@ public class ScreenManager : Singleton<ScreenManager>
 
     protected override void Awake()
     {
-        Application.targetFrameRate = 60;
+        Time.timeScale = 1f;
         base.Awake();
+        DontDestroyOnLoad(gameObject);
         screens.Add(ScreenID.HomeScreen, homeScreen);
         screens.Add(ScreenID.UpgradeScreen, upgradeScreen);
         screens.Add(ScreenID.SettingScreen, settingScreen);
         screens.Add(ScreenID.PauseScreen, pauseScreen);
         screens.Add(ScreenID.GameOverScreen, gameOverScreen);
         TransitionTo(ScreenID.HomeScreen);
-        DontDestroyOnLoad(gameObject);
-
         Observer.AddObserver(GameEvent.OnGameResume, UpdateCountdownUI);
     }
 
@@ -66,15 +66,19 @@ public class ScreenManager : Singleton<ScreenManager>
         previousScreen.Show();
     }
 
-    async void UpdateCountdownUI(object[] datas)
+    public void UpdateCountdownUI(object[] datas)
     {
-        float countdownDuration = (float)datas[0];
+        StartCoroutine(UpdateCountdownUICoroutine((float)datas[0]));
+    }
+    IEnumerator UpdateCountdownUICoroutine(float duration)
+    {
+        float countdownDuration = duration;
         if(countdownTimerText != null)
         countdownTimerText.gameObject.SetActive(true);
         for(float i = countdownDuration; i > 0; i--)
         {
             countdownTimerText.text = i.ToString();
-            await Task.Delay(TimeSpan.FromSeconds(1f));
+            yield return new WaitForSecondsRealtime(1f);
         }
         if(countdownTimerText != null)
         countdownTimerText.gameObject.SetActive(false);

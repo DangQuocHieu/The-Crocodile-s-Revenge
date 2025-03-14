@@ -314,6 +314,7 @@ MonoBehaviour:
   dealDamageSound: 12
   takeDamageSound: 11
   destroyOnHit: 0
+  cooldownSFX: 1
   effects: []
 --- !u!1 &520449495660326545
 GameObject:
@@ -629,6 +630,7 @@ MonoBehaviour:
   dealDamageSound: 12
   takeDamageSound: 11
   destroyOnHit: 0
+  cooldownSFX: 1
   effects: []
 --- !u!1 &3520016872227033408
 GameObject:
@@ -944,6 +946,7 @@ MonoBehaviour:
   dealDamageSound: 12
   takeDamageSound: 11
   destroyOnHit: 0
+  cooldownSFX: 1
   effects: []
 --- !u!1 &4864518270984572540
 GameObject:
@@ -1259,6 +1262,7 @@ MonoBehaviour:
   dealDamageSound: 12
   takeDamageSound: 11
   destroyOnHit: 0
+  cooldownSFX: 1
   effects: []
 --- !u!1 &6460734713770784020
 GameObject:
@@ -1625,6 +1629,7 @@ MonoBehaviour:
   dealDamageSound: 12
   takeDamageSound: 11
   destroyOnHit: 0
+  cooldownSFX: 1
   effects: []
 --- !u!1 &7952292338969578969
 GameObject:
@@ -1940,6 +1945,7 @@ MonoBehaviour:
   dealDamageSound: 12
   takeDamageSound: 11
   destroyOnHit: 0
+  cooldownSFX: 1
   effects: []
 --- !u!1 &9128220965969860136
 GameObject:
@@ -2255,4 +2261,5 @@ MonoBehaviour:
   dealDamageSound: 12
   takeDamageSound: 11
   destroyOnHit: 0
+  cooldownSFX: 1
   effects: []

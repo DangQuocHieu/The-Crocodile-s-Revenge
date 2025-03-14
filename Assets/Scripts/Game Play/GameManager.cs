@@ -19,13 +19,21 @@ public class GameManager: Singleton<GameManager>
     public float TimeEpalsed => timeElapsed;
     protected override void Awake()
     {
-        Time.timeScale = 1f;
+        instance = this;
+        Time.timeScale = 1;
         Observer.AddObserver(GameEvent.OnGameOver, OnGameOver);
         Observer.AddObserver(GameEvent.OnGamePaused, OnGamePaused);
         Observer.AddObserver(GameEvent.OnGameResume, OnGameResume);
         Observer.AddObserver(GameEvent.OnGameRestart, OnGameRestart);
         Observer.AddObserver(GameEvent.OnGobackToHomeScreen, OnGobackToHomeScreen);
-        base.Awake();
+    }
+    private void OnDestroy()
+    {
+        Observer.RemoveListener(GameEvent.OnGameOver, OnGameOver);
+        Observer.RemoveListener(GameEvent.OnGamePaused, OnGamePaused);
+        Observer.RemoveListener(GameEvent.OnGameResume, OnGameResume);
+        Observer.RemoveListener(GameEvent.OnGameRestart, OnGameRestart);
+        Observer.RemoveListener(GameEvent.OnGobackToHomeScreen, OnGobackToHomeScreen);
     }
 
     private void Update()
@@ -36,26 +44,33 @@ public class GameManager: Singleton<GameManager>
         Observer.Notify(GameEvent.OnUpdateGameStatisticUI, timeElapsed, distanceSoFar);
     }
 
-    async void OnGameOver(object[] datas)
+    void OnGameOver(object[] datas)
     {
         isGameOver = true;
         float delayDuration = (float)datas[0];
-        await Task.Delay(TimeSpan.FromSeconds(delayDuration));
-        if(ScreenManager.Instance != null)
-        ScreenManager.Instance.TransitionTo(ScreenID.GameOverScreen);
-        Time.timeScale = 0;
+        StartCoroutine(OnGameOverCoroutine(delayDuration));
     }
 
+    IEnumerator OnGameOverCoroutine(float duration)
+    {
+        yield return new WaitForSecondsRealtime(duration);
+        ScreenManager.Instance.TransitionTo(ScreenID.GameOverScreen);
+    }
     void OnGamePaused(object[] datas)
     {
         Time.timeScale = 0;
         ScreenManager.Instance.TransitionTo(ScreenID.PauseScreen);
     }
 
-    async void OnGameResume(object[] datas)
+     void OnGameResume(object[] datas)
     {
         ScreenManager.Instance.GoBack();
-        await Task.Delay(TimeSpan.FromSeconds((float)datas[0]));
+        StartCoroutine(ResumeGameCoroutine((float)datas[0]));
+    }
+
+    IEnumerator ResumeGameCoroutine(float duration)
+    {
+        yield return new WaitForSecondsRealtime(duration);
         Time.timeScale = 1;
     }
 
@@ -78,14 +93,7 @@ public class GameManager: Singleton<GameManager>
             ScreenManager.Instance.GoBack(isHidePrevScreen: false);
         });
     }
-    private void OnDestroy()
-    {
-        Observer.RemoveListener(GameEvent.OnGameOver, OnGameOver);
-        Observer.RemoveListener(GameEvent.OnGamePaused, OnGamePaused);
-        Observer.RemoveListener(GameEvent.OnGameResume, OnGameResume);
-        Observer.RemoveListener(GameEvent.OnGameRestart, OnGameRestart);
-        Observer.RemoveListener(GameEvent.OnGobackToHomeScreen, OnGobackToHomeScreen);
-    }
+
 
  
 }

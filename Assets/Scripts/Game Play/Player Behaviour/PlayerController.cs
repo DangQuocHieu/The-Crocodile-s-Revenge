@@ -12,6 +12,7 @@ public class PlayerController : Singleton<PlayerController>
     [SerializeField] CapsuleCollider2D bodyCollider;
     [SerializeField] LayerMask groundLayerMask;
     [SerializeField] float extraHeightCheck = 0.01f;
+    [SerializeField] float minVeclocityY;
     int jumpCount;
     Rigidbody2D playerRb;
     PowerUpEffect powerUpEffect;
@@ -26,6 +27,13 @@ public class PlayerController : Singleton<PlayerController>
         powerUpEffect = GetComponent<PowerUpEffect>();
         bodyCollider = GetComponent<CapsuleCollider2D>();
         Observer.AddObserver(GameEvent.OnGameOver, UpdateGameOverAnimation);
+        Observer.AddObserver(GameEvent.OnPlayerFinishRevive, OnFinishRevive);
+    }
+
+    private void OnDestroy()
+    {
+        Observer.RemoveListener(GameEvent.OnGameOver, UpdateGameOverAnimation);
+        Observer.RemoveListener(GameEvent.OnPlayerFinishRevive, OnFinishRevive);
     }
     private void Update()
     {
@@ -75,7 +83,7 @@ public class PlayerController : Singleton<PlayerController>
     //    return results.Count > 0; 
     //}
 
-    void ProcessJumping()
+    public void ProcessJumping()
     {
         if (isDisableControl) return;
         if (!IsGrounded())
@@ -101,17 +109,17 @@ public class PlayerController : Singleton<PlayerController>
     }
     void UpdateAnimation()
     {
-        playerAnim.SetBool("isMultipleJump", jumpCount >= powerUpEffect.CurrentMaxJumpCount);
+        playerAnim.SetBool("isMultipleJump", jumpCount == powerUpEffect.CurrentMaxJumpCount);
     }
 
     void OnGrounded()
     {
-        if(playerRb.linearVelocity.y > 0.00001f)
+        bool isGrounded = IsGrounded();
+        if (playerRb.linearVelocityY >= minVeclocityY)
         {
             return;
         }
-        bool isGrounded = IsGrounded();
-        if(!wasGrounded && isGrounded)
+        if (!wasGrounded && isGrounded)
         {
             jumpCount = 0;
             playerAnim.SetBool("isRunning", true);
@@ -127,4 +135,8 @@ public class PlayerController : Singleton<PlayerController>
         isDisableControl = true;
     }
 
+    void OnFinishRevive(object[] datas)
+    {
+        playerRb.linearVelocity = new Vector2(0, jumpForce);
+    }
 }

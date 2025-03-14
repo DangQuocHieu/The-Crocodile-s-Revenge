@@ -3,19 +3,21 @@ using UnityEngine;
 
 public class PlayerBodyCollision : MonoBehaviour
 {
-    [SerializeField] float hurtDuration;
     [SerializeField] SpriteRenderer spriteRenderer;
     [SerializeField] bool isInvicible = false;
+    public bool IsInvicible => isInvicible;
+    private Coroutine hurtCoroutine;
     
     protected void Awake()
     {
         Observer.AddObserver(GameEvent.OnPlayerHurt, OnHurt);
+        Observer.AddObserver(GameEvent.OnPlayerBeginRevive, StopOnHurtCoroutine);
     }
 
     private void OnDestroy()
     {
         Observer.RemoveListener(GameEvent.OnPlayerHurt, OnHurt);
-
+        Observer.RemoveListener(GameEvent.OnPlayerBeginRevive, StopOnHurtCoroutine);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -26,29 +28,28 @@ public class PlayerBodyCollision : MonoBehaviour
             collectible.OnCollect();
         }
         IDamaging damaging = collision.gameObject.GetComponent<IDamaging>();
-        if (damaging != null && !isInvicible)
+        int currentHealth = gameObject.GetComponent<PlayerHealthManager>().CurrentHealth;
+        if (damaging != null && !isInvicible && currentHealth > 0)
         {
             damaging.DealDamage(gameObject.transform);
-        }
-        if(collision.gameObject.CompareTag("Dead Zone"))
-        {
-            Observer.Notify(GameEvent.OnPlayerHurt);
-            float delayDuration = 2f;
-            Observer.Notify(GameEvent.OnGameOver, delayDuration);
-        }
-        
+        }        
     }
     void OnHurt(object[] datas)
     {
+        float hurtDuration = (float)(datas[0]);
         int currentHealth = GetComponent<PlayerHealthManager>().CurrentHealth;
         Debug.Log(currentHealth);
         if(currentHealth <= 0)
         {
             return;
         }
-        StartCoroutine(OnHurtCoroutine());
+        if(hurtCoroutine != null)
+        {
+            StopCoroutine(hurtCoroutine);
+        }
+        hurtCoroutine = StartCoroutine(OnHurtCoroutine(hurtDuration));
     }
-    IEnumerator OnHurtCoroutine()
+    IEnumerator OnHurtCoroutine(float hurtDuration)
     {
         isInvicible = true;
         float elapsedTime = 0f;
@@ -61,5 +62,17 @@ public class PlayerBodyCollision : MonoBehaviour
         }
         spriteRenderer.enabled = true;
         isInvicible = false;
+        hurtCoroutine = null;
     }
+
+    void StopOnHurtCoroutine(object[] datas)
+    {
+        if(hurtCoroutine != null)
+        {
+            StopCoroutine(hurtCoroutine);
+            hurtCoroutine = null;
+            spriteRenderer.enabled = true;
+        }
+    }
+
 }

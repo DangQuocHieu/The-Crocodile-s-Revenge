@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 public class PowerUpEffect : MonoBehaviour
@@ -14,11 +14,13 @@ public class PowerUpEffect : MonoBehaviour
     private Coroutine shieldCoroutine = null;
     private Coroutine magnetCoroutine = null;
 
+    private bool paused = false;
     private void Awake()
     {
         Observer.AddObserver(GameEvent.OnPlayerPickupTripleJumpPowerUp, OnPickupTripleJumpPowerUp);
         Observer.AddObserver(GameEvent.OnPlayerPickUpShieldPowerUp, OnPickUpShieldPowerUp);
         Observer.AddObserver(GameEvent.OnPlayerPickUpMagnetPowerUp, OnPickUpMagnetPowerUp);
+        Observer.AddObserver(GameEvent.OnPlayerBeginRevive, StopPowerupCoroutine);
     }
 
     private void OnDestroy()
@@ -26,6 +28,7 @@ public class PowerUpEffect : MonoBehaviour
         Observer.RemoveListener(GameEvent.OnPlayerPickupTripleJumpPowerUp, OnPickupTripleJumpPowerUp);
         Observer.RemoveListener(GameEvent.OnPlayerPickUpShieldPowerUp, OnPickUpShieldPowerUp);
         Observer.RemoveListener(GameEvent.OnPlayerPickUpMagnetPowerUp, OnPickUpMagnetPowerUp);
+        Observer.RemoveListener(GameEvent.OnPlayerBeginRevive, StopPowerupCoroutine);
     }
     private void Start()
     {
@@ -86,4 +89,30 @@ public class PowerUpEffect : MonoBehaviour
         magnetCoroutine = null;
         Observer.Notify(GameEvent.OnPowerdown);
     }
+
+    void StopPowerupCoroutine(object[] datas)
+    {
+        if (tripleJumpCoroutine != null)
+        {
+            StopCoroutine(tripleJumpCoroutine);
+            currentMaxJumpCount = maxJumpCount; // Reset lại số lần nhảy
+            tripleJumpCoroutine = null;
+        }
+
+        if (shieldCoroutine != null)
+        {
+            StopCoroutine(shieldCoroutine);
+            shield.SetActive(false); // Tắt khiên
+            shieldCoroutine = null;
+        }
+
+        if (magnetCoroutine != null)
+        {
+            StopCoroutine(magnetCoroutine);
+            magnetCollider.radius /= magnetMultiplier; // Reset lại phạm vi nam châm
+            magnetCoroutine = null;
+        }
+    }
+
+
 }

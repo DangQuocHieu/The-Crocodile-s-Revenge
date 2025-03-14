@@ -8,11 +8,10 @@ public class SettingScreenController : UIScreen
     [SerializeField] Button backButton;
     [SerializeField] float delayDuration = 0.2f;
     RectTransform rectTransform;
-    protected override void Awake()
+    private void Awake()
     {
         backButton.onClick.AddListener(() => { ScreenManager.Instance.GoBack(); });
         rectTransform = GetComponent<RectTransform>();
-        base.Awake();
     }
 
     public override Tweener Show()

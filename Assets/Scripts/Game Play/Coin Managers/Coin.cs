@@ -11,6 +11,14 @@ public class Coin : MonoBehaviour, ICollectible
     private void Awake()
     {
         Observer.AddObserver(GameEvent.OnPlayerPickUpDoubleCoinPowerUp, OnPickUpDoubleCoinPowerUp);
+        Observer.AddObserver(GameEvent.OnPlayerBeginRevive, StopDoubleCoinCoroutine);
+    }
+
+    private void OnDestroy()
+    {
+        Observer.RemoveListener(GameEvent.OnPlayerPickUpDoubleCoinPowerUp, OnPickUpDoubleCoinPowerUp);
+        Observer.RemoveListener(GameEvent.OnPlayerBeginRevive, StopDoubleCoinCoroutine);
+
     }
 
     private void FixedUpdate()
@@ -57,11 +65,10 @@ public class Coin : MonoBehaviour, ICollectible
         doubleCoinCoroutine = null;
         Observer.Notify(GameEvent.OnPowerdown);
     }
-
-    private void OnDestroy()
+    void StopDoubleCoinCoroutine(object[] datas)
     {
-        Observer.RemoveListener(GameEvent.OnPlayerPickUpDoubleCoinPowerUp, OnPickUpDoubleCoinPowerUp);
-
+        if(doubleCoinCoroutine != null)
+        StopCoroutine(doubleCoinCoroutine);
     }
 
 }

@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   duration: 0.5
   inConfig: {x: 0, y: 0}
-  outConfig: {x: 0, y: 500}
+  outConfig: {x: 0, y: 1000}
   ease: 4

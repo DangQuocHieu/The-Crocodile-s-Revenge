@@ -12,6 +12,8 @@ public class PowerupUIManager : MonoBehaviour
     Dictionary<PowerupType, RectTransform> powerupUIs = new Dictionary<PowerupType, RectTransform>();
     Dictionary<PowerupType, Slider> activeSlider = new Dictionary<PowerupType, Slider>();
     Dictionary<PowerupType, Coroutine> activeCoroutine = new Dictionary<PowerupType, Coroutine>();
+
+    List<RectTransform> spawnedUI = new List<RectTransform>();
     private void Awake()
     {
         powerupUIs.Add(PowerupType.DoubleCoin, doubleCoinUI);
@@ -19,11 +21,13 @@ public class PowerupUIManager : MonoBehaviour
         powerupUIs.Add(PowerupType.Shield, shieldUI);
         powerupUIs.Add(PowerupType.TripleJump, tripleJumpUI);
         Observer.AddObserver(GameEvent.OnPlayerPickUpPowerup, ActiveCountdownUI);
+        Observer.AddObserver(GameEvent.OnPlayerBeginRevive, DisableAllCountdownUI);
     }
 
     private void OnDestroy()
     {
         Observer.RemoveListener(GameEvent.OnPlayerPickUpPowerup,ActiveCountdownUI);
+        Observer.RemoveListener(GameEvent.OnPlayerBeginRevive, DisableAllCountdownUI);
     }
     void ActiveCountdownUI(object[] datas)
     {
@@ -36,6 +40,7 @@ public class PowerupUIManager : MonoBehaviour
             return;
         }
         RectTransform rect = Instantiate(powerupUIs[type], this.transform);
+        spawnedUI.Add(rect);
         Slider slider = rect.GetChild(0).GetComponent<Slider>();
         Countdown(type, duration, slider);
     }
@@ -62,7 +67,10 @@ public class PowerupUIManager : MonoBehaviour
         slider.value = slider.minValue;
         activeCoroutine.Remove(type);
         activeSlider.Remove(type);
-        Destroy(slider.transform.parent.gameObject);
+        if(slider != null)
+        {
+            Destroy(slider.transform.parent.gameObject);
+        }
     }
 
     void Refresh(PowerupType type, float duration)
@@ -72,5 +80,14 @@ public class PowerupUIManager : MonoBehaviour
         activeCoroutine.Remove(type);
         Slider currentSlider = activeSlider[type];
         Countdown(type, duration, currentSlider);
+    }
+    
+    void DisableAllCountdownUI(object[] datas)
+    {
+        foreach(var ui in spawnedUI)
+        {
+            if(ui != null)
+            Destroy(ui.gameObject);
+        }
     }
 }

@@ -15,4 +15,4 @@ MonoBehaviour:
   duration: 0.5
   inConfig: {x: 1, y: 1}
   outConfig: {x: 0, y: 0}
-  ease: 1
+  ease: 6

@@ -2,8 +2,7 @@
 using TMPro;
 using UnityEditor;
 using UnityEngine;
-[System.Serializable]
-public static class UIAnimationController
+public class UIAnimationController: MonoBehaviour
 {
     static UIAnimatonConfig scaleConfig = (UIAnimatonConfig)(Resources.Load<UIAnimatonConfig>("ScriptableObjects/ScaleConfig"));
     static UIAnimatonConfig slideConfig = (UIAnimatonConfig)(Resources.Load<UIAnimatonConfig>("ScriptableObjects/SlideConfig")); 

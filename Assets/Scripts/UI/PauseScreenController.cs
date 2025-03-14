@@ -13,7 +13,7 @@ public class PauseScreenController : UIScreen
 
     //duration wait for resume game
     [SerializeField] float countDownDuration = 3f;
-    protected override void Awake()
+    private void Awake()
     {
         resumeButton.onClick.AddListener(() =>
         {
@@ -25,7 +25,6 @@ public class PauseScreenController : UIScreen
         returnToTilescreenButton.onClick.AddListener(() => {
             Observer.Notify(GameEvent.OnGobackToHomeScreen);
         });
-        base.Awake();
     }
 
     public override Tweener Hide()
