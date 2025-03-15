@@ -38,17 +38,9 @@ public class AudioManager : Singleton<AudioManager>
         Observer.AddObserver(GameEvent.OnGameOver, PlayGameOverSFX);
         Observer.AddObserver(GameEvent.OnPlayerMultipleJump, PlayMultipleJumpSFX);
         Observer.AddObserver(GameEvent.OnPlayerBeginRevive, PlayHurtSFX);
-    }
-
-    private void OnEnable()
-    {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    private void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
     private void OnDestroy()
     {
         Observer.RemoveListener(GameEvent.OnGameStart, PlayStartSFX);
@@ -62,6 +54,7 @@ public class AudioManager : Singleton<AudioManager>
         Observer.RemoveListener(GameEvent.OnPlayerMultipleJump, PlayMultipleJumpSFX);
         Observer.RemoveListener(GameEvent.OnGameOver, PlayGameOverSFX);
         Observer.RemoveListener(GameEvent.OnPlayerBeginRevive, PlayHurtSFX);
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -80,9 +73,9 @@ public class AudioManager : Singleton<AudioManager>
     {
         foreach (var source in sfxAudioSourcePool.Values)
         {
-            source.outputAudioMixerGroup = audioMixer.FindMatchingGroups("SFX")[0]; // Gán vào nhóm SFX
+            source.outputAudioMixerGroup = audioMixer.FindMatchingGroups("SFX")[0];
         }
-        musicSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Music")[0]; // Gán vào nhóm Music
+        musicSource.outputAudioMixerGroup = audioMixer.FindMatchingGroups("Music")[0]; 
     }
     void InitializeAudioSourcePool()
     {
@@ -116,7 +109,7 @@ public class AudioManager : Singleton<AudioManager>
     public void PlayMusic(AudioName name)
     {
         AudioListener.pause = false;
-        if(musicSource.isPlaying)
+        if (musicSource.isPlaying)
         {
             musicSource.Stop();
         }
@@ -134,7 +127,7 @@ public class AudioManager : Singleton<AudioManager>
         musicSource.Play();
     }
 
-    public void StopMusic()
+    public void PauseMusic()
     {
         musicSource.Pause();
     }
@@ -173,13 +166,10 @@ public class AudioManager : Singleton<AudioManager>
 
     public void PlayMenuMusic(object[] datas)
     {
-        Debug.Log("PLAY");
         PlayMusic(AudioName.MenuMusic);
     }
     public void PlayGameMusic(object[] datas)
     {
-        AudioListener.pause = false;
-        Debug.Log("PLAY");
         PlayMusic(AudioName.GameMusic);
     }
     void PlayCoinSFX(object[] datas)
@@ -212,14 +202,19 @@ public class AudioManager : Singleton<AudioManager>
         PlaySFX(AudioName.MultipleJumpSFX);
     }
 
-    async void PlayGameOverSFX(object[] datas)
+    void PlayGameOverSFX(object[] datas)
+    {
+        float duration = (float)datas[0];
+        StartCoroutine(PlayGameOverSFXCoroutine(duration));
+    }
+    
+    IEnumerator PlayGameOverSFXCoroutine(float duration)
     {
         musicSource.Stop();
-        float duration = (float)datas[0];
-        await Task.Delay(TimeSpan.FromSeconds(duration));
+        yield return new WaitForSecondsRealtime(duration);
+        AudioListener.pause = false;
         PlaySFX(AudioName.GameOverSFX);
     }
-
     public void PlayStartSFX(object[] datas)
     {
         musicSource.Stop();

@@ -4,6 +4,7 @@ using UnityEngine;
 public class PowerUpEffect : MonoBehaviour
 {
     [SerializeField] GameObject shield;
+    [SerializeField] GameObject goldenShield;
     [SerializeField] CircleCollider2D magnetCollider;
     [SerializeField] float magnetMultiplier;
     int currentMaxJumpCount;
@@ -13,7 +14,7 @@ public class PowerUpEffect : MonoBehaviour
     private Coroutine tripleJumpCoroutine = null;
     private Coroutine shieldCoroutine = null;
     private Coroutine magnetCoroutine = null;
-
+    private Coroutine goldenShieldCoroutine = null;
     private bool paused = false;
     private void Awake()
     {
@@ -21,6 +22,7 @@ public class PowerUpEffect : MonoBehaviour
         Observer.AddObserver(GameEvent.OnPlayerPickUpShieldPowerUp, OnPickUpShieldPowerUp);
         Observer.AddObserver(GameEvent.OnPlayerPickUpMagnetPowerUp, OnPickUpMagnetPowerUp);
         Observer.AddObserver(GameEvent.OnPlayerBeginRevive, StopPowerupCoroutine);
+        Observer.AddObserver(GameEvent.OnPlayerPickUpGoldenShieldPowerup, OnPickUpGoldenShieldPowerUp);
     }
 
     private void OnDestroy()
@@ -29,6 +31,7 @@ public class PowerUpEffect : MonoBehaviour
         Observer.RemoveListener(GameEvent.OnPlayerPickUpShieldPowerUp, OnPickUpShieldPowerUp);
         Observer.RemoveListener(GameEvent.OnPlayerPickUpMagnetPowerUp, OnPickUpMagnetPowerUp);
         Observer.RemoveListener(GameEvent.OnPlayerBeginRevive, StopPowerupCoroutine);
+        Observer.RemoveListener(GameEvent.OnPlayerPickUpGoldenShieldPowerup, OnPickUpGoldenShieldPowerUp);
     }
     private void Start()
     {
@@ -68,6 +71,24 @@ public class PowerUpEffect : MonoBehaviour
         yield return new WaitForSeconds(duration);
         shield.SetActive(false);
         shieldCoroutine = null;
+        Observer.Notify(GameEvent.OnPowerdown);
+    }
+
+    void OnPickUpGoldenShieldPowerUp(object[] datas)
+    {
+        if (goldenShieldCoroutine != null)
+        {
+            StopCoroutine(goldenShieldCoroutine);
+        }
+        goldenShieldCoroutine = StartCoroutine(GoldenShieldEffect((float)datas[0]));
+    }
+
+    IEnumerator GoldenShieldEffect(float duration)
+    {
+        goldenShield.SetActive(true);
+        yield return new WaitForSeconds(duration);
+        goldenShield.SetActive(false);
+        goldenShieldCoroutine = null;
         Observer.Notify(GameEvent.OnPowerdown);
     }
 

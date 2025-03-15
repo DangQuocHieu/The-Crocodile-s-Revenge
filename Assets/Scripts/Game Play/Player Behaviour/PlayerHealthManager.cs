@@ -25,7 +25,8 @@ public class PlayerHealthManager : Singleton<PlayerHealthManager>
     void TakeDamage(object[] damage)
     {
         currentHealth -= (int)damage[0];
-        if(currentHealth <= 0)
+        if (currentHealth < 0) return;
+        if(currentHealth == 0)
         {
             float delayDuration = 2f;
             Observer.Notify(GameEvent.OnGameOver, delayDuration);

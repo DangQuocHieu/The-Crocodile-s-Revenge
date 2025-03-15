@@ -8,6 +8,7 @@ public enum GameEvent
     OnPlayerPickUpCoin,
     OnPlayerPickUpDoubleCoinPowerUp,
     OnPlayerPickUpMagnetPowerUp,
+    OnPlayerPickUpGoldenShieldPowerup,
     OnPowerdown,
     OnGameDifficultyIncreasing,
     OnGameStart,

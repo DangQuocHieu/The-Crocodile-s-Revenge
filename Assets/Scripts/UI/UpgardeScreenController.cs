@@ -15,8 +15,7 @@ public class UpgardeScreenController : UIScreen
 
     public override Tweener Show()
     {
-        UITransitionController.SlideTransition(async() => {
-            await Task.Yield();
+        UITransitionController.SlideTransition(() => {
             gameObject.SetActive(true); 
         });
         return null;
@@ -25,8 +24,7 @@ public class UpgardeScreenController : UIScreen
 
     public override Tweener Hide()
     {
-        UITransitionController.SlideTransition(async() => {
-            await Task.Yield();
+        UITransitionController.SlideTransition(() => {
             gameObject.SetActive(false); });
         return null;
     }

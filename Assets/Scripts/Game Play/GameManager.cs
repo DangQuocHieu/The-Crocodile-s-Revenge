@@ -76,21 +76,21 @@ public class GameManager: Singleton<GameManager>
 
     void OnGameRestart(object[] datas)
     {
-        UITransitionController.SlideAndScaleTransition(async () =>
+        UITransitionController.SlideAndScaleTransition( () =>
         {
             Time.timeScale = 1f;
-            await SceneManager.LoadSceneAsync("Game Scene");
+            SceneManager.LoadScene("Game Scene");
             ScreenManager.Instance.GoBack();
         });
     }
 
     void OnGobackToHomeScreen(object[] datas)
     {
-        UITransitionController.SlideAndScaleTransition(async () =>
+        UITransitionController.SlideAndScaleTransition(() =>
         {
             Time.timeScale = 1;
-            await SceneManager.LoadSceneAsync("Menu Scene");
             ScreenManager.Instance.GoBack(isHidePrevScreen: false);
+            SceneManager.LoadScene("Menu Scene");
         });
     }
 

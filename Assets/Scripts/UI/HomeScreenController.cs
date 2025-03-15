@@ -22,9 +22,9 @@ public class HomeScreenController : UIScreen
     {
         Observer.Notify(GameEvent.OnGameStart);
         Time.timeScale = 1;
-        UITransitionController.SlideAndScaleTransition(async() =>
+        UITransitionController.SlideAndScaleTransition(() =>
         {
-            await SceneManager.LoadSceneAsync("Game Scene");
+            SceneManager.LoadScene("Game Scene");
             Hide();
         });
     }

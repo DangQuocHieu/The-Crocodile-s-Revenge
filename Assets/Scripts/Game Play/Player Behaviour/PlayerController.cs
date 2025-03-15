@@ -127,11 +127,10 @@ public class PlayerController : Singleton<PlayerController>
         wasGrounded = isGrounded;
     }
 
-    async void UpdateGameOverAnimation(object[] datas)
+    void UpdateGameOverAnimation(object[] datas)
     {
         if(playerAnim != null)
         playerAnim.SetTrigger("Die");
-        await Task.Yield();
         isDisableControl = true;
     }
 

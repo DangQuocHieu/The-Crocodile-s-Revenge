@@ -17,6 +17,7 @@ public class PlayerReviveManager : MonoBehaviour
     {
         playerRb = GetComponent<Rigidbody2D>();
         Observer.AddObserver(GameEvent.OnPlayerBeginRevive, OnBeginRevive);
+        Observer.AddObserver(GameEvent.OnGameOver, DisableRevive);
     }
 
     private void FixedUpdate()
@@ -34,21 +35,25 @@ public class PlayerReviveManager : MonoBehaviour
     private void OnDestroy()
     {
         Observer.RemoveListener(GameEvent.OnPlayerBeginRevive, OnBeginRevive);
-        
+        Observer.RemoveListener(GameEvent.OnGameOver, DisableRevive);
+
     }
     void OnBeginRevive(object[] datas)
     {
+        int currentHealth = GetComponent<PlayerHealthManager>().CurrentHealth;
+        if (currentHealth <= 1) return;
         StartCoroutine(BeginRevive());
     }
 
     IEnumerator BeginRevive()
     {
         playerRb.bodyType = RigidbodyType2D.Static;
-        AudioManager.Instance.StopMusic();
+        AudioManager.Instance.PauseMusic();
         yield return new WaitForSecondsRealtime(0.5f);
-        transform.DOMove(new Vector2(transform.position.x, reviveYPosition), 1f);
-        yield return null;
-        isReviving = true;
+        transform.DOMove(new Vector2(transform.position.x, reviveYPosition), 1f).OnComplete(() =>
+        {
+            isReviving = true;
+        });
     }
 
     void FinishRevive()
@@ -58,6 +63,11 @@ public class PlayerReviveManager : MonoBehaviour
         isReviving = false;
         Observer.Notify(GameEvent.OnPlayerFinishRevive);
         Observer.Notify(GameEvent.OnPlayerHurt, hurtDuration);
+    }
+
+    void DisableRevive(object[] datas)
+    {
+        enabled = false;
     }
 
 }
