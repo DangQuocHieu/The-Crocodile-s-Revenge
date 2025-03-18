@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class Obstacle : MonoBehaviour, IDamaging, IDamageable, ICoinTransformable
+public class Obstacle : MonoBehaviour, IDamaging, IDamageable
 {
     [SerializeField] int damage = 1;
     [SerializeField] float hurtDuration = 3f;
@@ -13,7 +13,6 @@ public class Obstacle : MonoBehaviour, IDamaging, IDamageable, ICoinTransformabl
     [SerializeField] bool destroyOnHit;
     [SerializeField] bool cooldownSFX = false;
     [SerializeField] GameObject[] effects;
-    [SerializeField] GameObject coinPrefab;
 
     public virtual void DealDamage(Transform target)
     {
@@ -44,12 +43,6 @@ public class Obstacle : MonoBehaviour, IDamaging, IDamageable, ICoinTransformabl
             Destroy(Instantiate(effect, transform.position, effect.transform.rotation), destroyEffectDuration);
         }
         AudioManager.Instance.PlaySFX(takeDamageSound, isCooldown: cooldownSFX);
-        Destroy(gameObject);
-    }
-
-    public void TransformToCoins()
-    {
-        Instantiate(coinPrefab, transform.position, Quaternion.identity);
         Destroy(gameObject);
     }
 }

@@ -1,60 +1,45 @@
-using NUnit.Framework;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class DataPersistenceManager : Singleton<DataPersistenceManager>
 {
-    [SerializeField] string fileName;
-    GameData gameData;
-    List<IDataPersistence> dataPersistanceObjects;
-    FileDataHandler fileDataHandler;
-    [SerializeField] bool isEncrypted;
+    private GameData gameData;
+    public GameData GameData => gameData;
 
     protected override void Awake()
     {
         base.Awake();
         DontDestroyOnLoad(gameObject);
+        Observer.AddObserver(GameEvent.OnPlayerUpgradePowerup, OnUpgrade);
     }
-    void Start()
+    private void OnDestroy()
     {
-        fileDataHandler = new FileDataHandler(Application.persistentDataPath, fileName, isEncrypted);    
-        this.dataPersistanceObjects = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<IDataPersistence>().ToList();
-        LoadGame();
+        Observer.RemoveListener(GameEvent.OnPlayerUpgradePowerup, OnUpgrade);
     }
-
-   
-    void Update()
+    
+    public void LoadGame(GameData gameData)
     {
-        
+        this.gameData = gameData; 
     }
 
-    public void LoadGame()
+    public void OnUpgrade(object[] datas)
     {
-        gameData = fileDataHandler.Load();
-        if(gameData == null)
+        PowerupType type = (PowerupType)datas[0];
+        switch (type)
         {
-            gameData = new GameData();
+            case PowerupType.Shield:
+                ++gameData.shieldLevel;
+                break;
+            case PowerupType.DoubleCoin:
+                ++gameData.doublecoinLevel;
+                break;
+            case PowerupType.Magnet:
+                ++gameData.magnetLevel;
+                break;
+            case PowerupType.TripleJump:
+                ++gameData.tripleJumpLevel;
+                break;
         }
-        foreach(var dataPersistanceObj in dataPersistanceObjects)
-        {
-            dataPersistanceObj.LoadData(gameData);
-        }
-    }
-
-    public void SaveGame()
-    {
-        foreach (var dataPersistanceObj in dataPersistanceObjects)  
-        {
-            if(dataPersistanceObj != null)
-            dataPersistanceObj.SaveData(gameData);
-        }
-        fileDataHandler.Save(gameData);
-    }
-
-    private void OnApplicationQuit()
-    {
-        SaveGame();
+        PlayFabManager.Instance.SavePlayerData();
     }
 
 }

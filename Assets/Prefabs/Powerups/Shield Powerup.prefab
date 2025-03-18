@@ -124,8 +124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78ac04a4b3518a741aecb3870f66027c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  duration: 10
-  type: 3
+  powerupData: {fileID: 11400000, guid: dd0f942ea95f2974d8bb40e4329648b6, type: 2}
   powerupCountdownUI: {fileID: 8984862109911907001, guid: f31b71c792cb72b4db88b2c50da02179, type: 3}
 --- !u!61 &8329915136567355341
 BoxCollider2D:

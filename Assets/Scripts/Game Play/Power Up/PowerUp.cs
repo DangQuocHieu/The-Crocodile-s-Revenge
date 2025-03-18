@@ -7,12 +7,13 @@ using UnityEngine.Tilemaps;
 
 public abstract class PowerUp : MonoBehaviour, ICollectible
 {
-    [SerializeField] protected float duration = 5f;
-    [SerializeField] protected PowerupType type;
-    [SerializeField] RectTransform powerupCountdownUI;
+    protected int level = 1;
+    protected float currentDuration;
+    [SerializeField] protected PowerupData powerupData;
+
     public virtual void OnCollect()
     {
-        Observer.Notify(GameEvent.OnPlayerPickUpPowerup, type, duration);
+        Observer.Notify(GameEvent.OnPlayerPickUpPowerup, powerupData.type, currentDuration);
         Destroy(gameObject);
     }
 

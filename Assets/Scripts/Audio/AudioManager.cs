@@ -38,6 +38,8 @@ public class AudioManager : Singleton<AudioManager>
         Observer.AddObserver(GameEvent.OnGameOver, PlayGameOverSFX);
         Observer.AddObserver(GameEvent.OnPlayerMultipleJump, PlayMultipleJumpSFX);
         Observer.AddObserver(GameEvent.OnPlayerBeginRevive, PlayHurtSFX);
+        Observer.AddObserver(GameEvent.OnPlayerBeginRevive, PauseMusic);
+        Observer.AddObserver(GameEvent.OnPlayerFinishRevive, ContinuePlayMusic);
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
@@ -54,19 +56,20 @@ public class AudioManager : Singleton<AudioManager>
         Observer.RemoveListener(GameEvent.OnPlayerMultipleJump, PlayMultipleJumpSFX);
         Observer.RemoveListener(GameEvent.OnGameOver, PlayGameOverSFX);
         Observer.RemoveListener(GameEvent.OnPlayerBeginRevive, PlayHurtSFX);
+        Observer.RemoveListener(GameEvent.OnPlayerBeginRevive, PauseMusic);
+        Observer.RemoveListener(GameEvent.OnPlayerFinishRevive, ContinuePlayMusic);
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        switch(scene.name)
+        if (scene.name == "Menu Scene")
         {
-            case "Menu Scene":
-                PlayMenuMusic(null);
-                break;
-            case "Game Scene":
-                PlayGameMusic(null);
-                break;
+            PlayMusic(AudioName.MenuMusic);
+        }
+        else if (scene.name == "Game Scene")
+        {
+            PlayMusic(AudioName.GameMusic);
         }
     }
     void ApplyAudioMixer()
@@ -108,11 +111,11 @@ public class AudioManager : Singleton<AudioManager>
 
     public void PlayMusic(AudioName name)
     {
-        AudioListener.pause = false;
         if (musicSource.isPlaying)
         {
             musicSource.Stop();
         }
+        musicSource.UnPause();
         foreach(var audio in musicAudios)
         {
             if(audio.audioName == name)
@@ -124,15 +127,16 @@ public class AudioManager : Singleton<AudioManager>
                 musicSource.priority = audio.priority;
             }
         }
+        AudioListener.pause = false;
         musicSource.Play();
     }
 
-    public void PauseMusic()
+    public void PauseMusic(object[] datas)
     {
         musicSource.Pause();
     }
 
-    public void ContinuePlayMusic()
+    public void ContinuePlayMusic(object[] datas)
     {
         musicSource.UnPause();
     }
@@ -163,7 +167,6 @@ public class AudioManager : Singleton<AudioManager>
             source.PlayOneShot(source.clip);
         }
     }
-
     public void PlayMenuMusic(object[] datas)
     {
         PlayMusic(AudioName.MenuMusic);
@@ -220,4 +223,5 @@ public class AudioManager : Singleton<AudioManager>
         musicSource.Stop();
         PlaySFX(AudioName.GameStartSFX);
     }
+
 }

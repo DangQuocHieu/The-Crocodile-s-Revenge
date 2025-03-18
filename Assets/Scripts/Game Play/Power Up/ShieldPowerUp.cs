@@ -1,20 +1,17 @@
 using UnityEngine;
 
-public class ShieldPowerUp : PowerUp, IDataPersistence
+public class ShieldPowerUp : PowerUp
 {
+    private void Awake()
+    {
+        level = DataPersistenceManager.Instance.GameData.shieldLevel;
+        currentDuration = level * powerupData.durationIncreasePerLevel + powerupData.baseDuration;
+    }
     public override void OnCollect()
     {
-        Observer.Notify(GameEvent.OnPlayerPickUpShieldPowerUp, duration);
+        Observer.Notify(GameEvent.OnPlayerPickUpShieldPowerUp, currentDuration);
         base.OnCollect(); 
     }
 
-    public void SaveData(GameData data)
-    {
-        data.shieldPowerupDuration = duration;
-    }
-    public void LoadData(GameData data)
-    {
-        duration = data.shieldPowerupDuration;
-    }
 }
         

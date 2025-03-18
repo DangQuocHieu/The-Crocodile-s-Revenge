@@ -46,6 +46,7 @@ public class GameManager: Singleton<GameManager>
 
     void OnGameOver(object[] datas)
     {
+        PlayFabManager.Instance.SendLeaderboard(DistanceSoFar);
         isGameOver = true;
         float delayDuration = (float)datas[0];
         StartCoroutine(OnGameOverCoroutine(delayDuration));

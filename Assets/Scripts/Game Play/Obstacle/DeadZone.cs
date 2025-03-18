@@ -4,12 +4,12 @@ public class DeadZone : MonoBehaviour
 {
     [SerializeField] int damage = 1;
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player"))
         {
             bool isInvicible = collision.gameObject.GetComponent<PlayerBodyCollision>().IsInvicible;
-            if(!isInvicible)
+            if (!isInvicible)
             {
                 Observer.Notify(GameEvent.OnObstacleHitPlayer, damage);
             }
@@ -17,5 +17,9 @@ public class DeadZone : MonoBehaviour
             if (currentHealth == 0) return;
             Observer.Notify(GameEvent.OnPlayerBeginRevive);
         }
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+       
     }
 }

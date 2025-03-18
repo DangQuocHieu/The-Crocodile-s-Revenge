@@ -121,8 +121,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
+  hurtDuration: 3
+  destroyEffectDuration: 0.5
+  dealDamageSound: 0
+  takeDamageSound: 0
   destroyOnHit: 1
-  hitParticleEffect: {fileID: 0}
+  cooldownSFX: 0
+  effects: []
+  coinPrefab: {fileID: 8936325105785966958, guid: a36291dcb4474d041b095f40e3fb9ebb, type: 3}
 --- !u!1001 &9024969750956987930
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -137,7 +143,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3626916397498700004, guid: 0c9ff5b9ce690b0478312126a5bcfa1a, type: 3}
       propertyPath: m_SortingLayer
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3626916397498700004, guid: 0c9ff5b9ce690b0478312126a5bcfa1a, type: 3}
       propertyPath: m_SortingLayerID

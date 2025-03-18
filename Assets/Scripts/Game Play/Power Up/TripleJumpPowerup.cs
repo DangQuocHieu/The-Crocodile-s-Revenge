@@ -1,22 +1,18 @@
 using UnityEngine;
 
-public class TripleJumpPowerup : PowerUp, IDataPersistence
+public class TripleJumpPowerup : PowerUp
 {
     [SerializeField] int jumpCount = 3;
 
-    public void LoadData(GameData data)
+    private void Awake()
     {
-        duration = data.tripleJumpPowerupDuration;
+        level = DataPersistenceManager.Instance.GameData.tripleJumpLevel;
+        currentDuration = powerupData.baseDuration + powerupData.durationIncreasePerLevel * level;
     }
-
     public override void OnCollect()
     {
-        Observer.Notify(GameEvent.OnPlayerPickupTripleJumpPowerUp, duration, jumpCount);
+        Observer.Notify(GameEvent.OnPlayerPickupTripleJumpPowerUp, currentDuration, jumpCount);
         base.OnCollect();
     }
 
-    public void SaveData(GameData data)
-    {
-        data.tripleJumpPowerupDuration = duration;
-    }
 }

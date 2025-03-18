@@ -3,14 +3,23 @@ using UnityEngine;
 [System.Serializable]
 public class GameData
 {
-    public int totalCoin;
-    public float shieldPowerupDuration;
-    public float tripleJumpPowerupDuration;
-    
+    public int shieldLevel;
+    public int tripleJumpLevel;
+    public int magnetLevel;
+    public int doublecoinLevel;
+
     public GameData()
     {
-        this.totalCoin = 0;
-        this.shieldPowerupDuration = 5f;
-        this.tripleJumpPowerupDuration = 5f;
+        this.shieldLevel = 1;
+        this.tripleJumpLevel = 1;
+        this.magnetLevel = 1;
+        this.doublecoinLevel = 1;
+    }
+    public GameData(int shieldLevel, int tripleJumpLevel, int magnetLevel, int doublecoinLevel)
+    {
+        this.shieldLevel = shieldLevel;
+        this.tripleJumpLevel = tripleJumpLevel;
+        this.magnetLevel = magnetLevel;
+        this.doublecoinLevel = doublecoinLevel;
     }
 }

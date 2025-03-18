@@ -11,10 +11,11 @@ public class UIAnimationController: MonoBehaviour
         
         if(isIn)
         {
+            rectTransform.localScale = Vector3.zero;
             return rectTransform.DOScale(scaleConfig.inConfig, scaleConfig.duration).SetEase(scaleConfig.ease).SetUpdate(true);
         }
         else
-        {
+        {   
             return rectTransform.DOScale(scaleConfig.outConfig, scaleConfig.duration).SetEase(scaleConfig.ease).SetUpdate(true);
         }
     }

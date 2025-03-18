@@ -171,10 +171,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
+  hurtDuration: 3
   destroyEffectDuration: 0.5
   dealDamageSound: 12
   takeDamageSound: 11
   destroyOnHit: 0
+  cooldownSFX: 0
   effects:
   - {fileID: 3651499363071551047, guid: 48d737ef1b4b9294f8f0350d3539975d, type: 3}
   - {fileID: 4908858236862959111, guid: df245aabecf89e741ae1ca1b5653bf39, type: 3}
+  coinPrefab: {fileID: 8936325105785966958, guid: a36291dcb4474d041b095f40e3fb9ebb, type: 3}

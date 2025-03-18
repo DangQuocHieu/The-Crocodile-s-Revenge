@@ -7,7 +7,7 @@ public class PlayerBodyCollision : MonoBehaviour
     [SerializeField] bool isInvicible = false;
     public bool IsInvicible => isInvicible;
     private Coroutine hurtCoroutine;
-    
+
     protected void Awake()
     {
         Observer.AddObserver(GameEvent.OnPlayerHurt, OnHurt);
@@ -19,6 +19,7 @@ public class PlayerBodyCollision : MonoBehaviour
         Observer.RemoveListener(GameEvent.OnPlayerHurt, OnHurt);
         Observer.RemoveListener(GameEvent.OnPlayerBeginRevive, StopOnHurtCoroutine);
     }
+
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

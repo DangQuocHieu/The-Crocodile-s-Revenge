@@ -92,8 +92,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f755d9b3f86d1641ab59da2715c39c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  duration: 10
-  type: 2
+  powerupData: {fileID: 11400000, guid: 39ac952cb97e0bd4d9a9f6fc8b981603, type: 2}
   powerupCountdownUI: {fileID: 8984862109911907001, guid: 9022bd0138a936349a97ac3224364661, type: 3}
   jumpCount: 3
 --- !u!212 &7811984527476245286

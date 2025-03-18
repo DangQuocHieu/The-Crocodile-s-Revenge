@@ -310,12 +310,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
+  hurtDuration: 3
   destroyEffectDuration: 0.5
   dealDamageSound: 12
   takeDamageSound: 11
   destroyOnHit: 0
   cooldownSFX: 1
   effects: []
+  coinPrefab: {fileID: 8936325105785966958, guid: c7bf4f4feabfe794890c19e2d8576b9b, type: 3}
 --- !u!1 &520449495660326545
 GameObject:
   m_ObjectHideFlags: 0
@@ -626,12 +628,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
+  hurtDuration: 3
   destroyEffectDuration: 0.5
   dealDamageSound: 12
   takeDamageSound: 11
   destroyOnHit: 0
   cooldownSFX: 1
   effects: []
+  coinPrefab: {fileID: 8936325105785966958, guid: c7bf4f4feabfe794890c19e2d8576b9b, type: 3}
 --- !u!1 &3520016872227033408
 GameObject:
   m_ObjectHideFlags: 0
@@ -942,12 +946,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
+  hurtDuration: 3
   destroyEffectDuration: 0.5
   dealDamageSound: 12
   takeDamageSound: 11
   destroyOnHit: 0
   cooldownSFX: 1
   effects: []
+  coinPrefab: {fileID: 8936325105785966958, guid: c7bf4f4feabfe794890c19e2d8576b9b, type: 3}
 --- !u!1 &4864518270984572540
 GameObject:
   m_ObjectHideFlags: 0
@@ -1258,12 +1264,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
+  hurtDuration: 3
   destroyEffectDuration: 0.5
   dealDamageSound: 12
   takeDamageSound: 11
   destroyOnHit: 0
   cooldownSFX: 1
   effects: []
+  coinPrefab: {fileID: 8936325105785966958, guid: c7bf4f4feabfe794890c19e2d8576b9b, type: 3}
 --- !u!1 &6460734713770784020
 GameObject:
   m_ObjectHideFlags: 0
@@ -1625,12 +1633,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
+  hurtDuration: 3
   destroyEffectDuration: 0.5
   dealDamageSound: 12
   takeDamageSound: 11
   destroyOnHit: 0
   cooldownSFX: 1
   effects: []
+  coinPrefab: {fileID: 8936325105785966958, guid: c7bf4f4feabfe794890c19e2d8576b9b, type: 3}
 --- !u!1 &7952292338969578969
 GameObject:
   m_ObjectHideFlags: 0
@@ -1941,12 +1951,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
+  hurtDuration: 3
   destroyEffectDuration: 0.5
   dealDamageSound: 12
   takeDamageSound: 11
   destroyOnHit: 0
   cooldownSFX: 1
   effects: []
+  coinPrefab: {fileID: 8936325105785966958, guid: c7bf4f4feabfe794890c19e2d8576b9b, type: 3}
 --- !u!1 &9128220965969860136
 GameObject:
   m_ObjectHideFlags: 0
@@ -2257,9 +2269,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
+  hurtDuration: 3
   destroyEffectDuration: 0.5
   dealDamageSound: 12
   takeDamageSound: 11
   destroyOnHit: 0
   cooldownSFX: 1
   effects: []
+  coinPrefab: {fileID: 8936325105785966958, guid: c7bf4f4feabfe794890c19e2d8576b9b, type: 3}
