@@ -1,4 +1,6 @@
 using DG.Tweening;
+using DG.Tweening.Core;
+using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -32,23 +34,22 @@ public class HomeScreenController : UIScreen
     {
         Observer.Notify(GameEvent.OnGameStart);
         Time.timeScale = 1;
-        PlayFabManager.Instance.LoadPlayerData();
-        UITransitionController.SlideAndScaleTransition(() =>
+        StartCoroutine(UITransitionController.SlideAndScaleTransition(() =>
         {
-            SceneManager.LoadScene("Game Scene");
-            Hide();
-        });
+            StartCoroutine(Hide());
+            SceneManager.LoadSceneAsync("Game Scene");
+        }));
     }
-    public override Tweener Show()
+    public override IEnumerator Show()
     {
         gameObject.SetActive(true);
-        return null;
+        yield return null;
     }
 
-    public override Tweener Hide()
+    public override IEnumerator Hide()
     {
         gameObject.SetActive(false);
-        return null;
+        yield return null;
     }
 
 

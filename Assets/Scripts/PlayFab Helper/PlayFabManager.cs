@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,28 +16,27 @@ public class PlayFabManager : Singleton<PlayFabManager>
     {
         base.Awake();
         DontDestroyOnLoad(this);
+        Observer.AddObserver(GameEvent.OnPlayerLogin, OnPlayerLogin);
 
     }
 
-    private void Start()
+    private void OnDestroy()
     {
-        if(!PlayerPrefs.HasKey("PlayfabSessionTicket"))
-        {
-            LoginAsAGuest();
-            LoadMenuScene();
-        }
-        else
-        {
-            
-        }
+        Observer.RemoveListener(GameEvent.OnPlayerLogin, OnPlayerLogin);
     }
-
     private void Update()
     {
         if(currentPlayerText != null)
         currentPlayerText.text = "CURRENT USER: "+ currentId.ToString();
     }
 
+
+    public void OnPlayerLogin(object[] datas)
+    {
+        string username = (string)datas[0];
+        string password = (string)datas[1];
+        Login(username, password);
+    }
     public void GetUser()
     {
         PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest(), result =>
@@ -44,17 +44,6 @@ public class PlayFabManager : Singleton<PlayFabManager>
             currentId = result.AccountInfo.PlayFabId;
         }, OnError);
     }
-
-    void LoginAsAGuest()
-    {
-        var request = new LoginWithCustomIDRequest
-        {
-            CustomId = SystemInfo.deviceUniqueIdentifier,
-            CreateAccount = true,
-        };
-        PlayFabClientAPI.LoginWithCustomID(request, OnSuccess, OnError);
-    }
-
 
     public void Register(string username, string password, string email)
     {
@@ -75,22 +64,16 @@ public class PlayFabManager : Singleton<PlayFabManager>
             Username = username,
             Password = password
         };
-        PlayFabClientAPI.LoginWithPlayFab(request, OnLoginSuccess, OnError);
-    }
-
-    public void LinkAccountToGuest(string email, string password)
-    {
-        var request = new AddUsernamePasswordRequest
+        PlayFabClientAPI.LoginWithPlayFab(request, result =>
         {
-            Email = email,
-            Password = password
-        };
-        PlayFabClientAPI.AddUsernamePassword(request, OnLinkAccountSuccess, OnError);
-    }
-    void OnSuccess(LoginResult result)
-    {
-        GetUser();
-        Debug.Log("Successful login/account create !");
+            Observer.Notify(GameEvent.OnLoginSuccess, result);
+            LoadPlayerData();
+            Debug.Log("Login Successfully");
+        }, error =>
+        {
+            Debug.Log(error.GenerateErrorReport());
+            Observer.Notify(GameEvent.OnLoginError, error);
+        });
     }
 
     void OnError(PlayFabError error)
@@ -203,19 +186,8 @@ public class PlayFabManager : Singleton<PlayFabManager>
         
     }
 
-    public void OnLoginSuccess(LoginResult result)
-    {
-        GetUser();
-        Debug.Log("Đăng nhập thành công !");
-        string sessionTicket = result.SessionTicket;
-        PlayerPrefs.SetString("PlayfabSessionTicket", sessionTicket);
-        PlayerPrefs.Save();
-    }
 
-    public void OnLinkAccountSuccess(AddUsernamePasswordResult result)
-    {
-        Debug.Log("Liên kết thành công");
-    }
+
     private void OnApplicationQuit()
     {
         SavePlayerData();

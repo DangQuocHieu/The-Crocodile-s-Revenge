@@ -1,5 +1,6 @@
 using DG.Tweening;
 using NUnit.Framework;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -24,22 +25,18 @@ public class LeaderboardScreen : UIScreen
     {
         Observer.RemoveListener(GameEvent.OnLeaderboardGet, DisplayLeaderboard);
     }
-    public override Tweener Show()
+    public override IEnumerator Show()
     {
         overlay.gameObject.SetActive(true);
         gameObject.SetActive(true);
-        UIAnimationController.ScaleUIAnimation(rectTransform, isIn: true);
-        return null;
+        yield return UIAnimationController.ScaleUIAnimation(rectTransform, isIn: true);
     }
 
-    public override Tweener Hide()
+    public override IEnumerator Hide()
     {
         overlay.gameObject.SetActive(false);
-        UIAnimationController.ScaleUIAnimation(rectTransform, isIn: false).OnComplete(() =>
-        {
-            gameObject.SetActive(false);
-        });
-        return null;
+        yield return UIAnimationController.ScaleUIAnimation(rectTransform, isIn: false);
+        gameObject.SetActive(false);
     }
 
     public void DisplayLeaderboard(object[] datas)

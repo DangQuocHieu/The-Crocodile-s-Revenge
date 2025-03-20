@@ -1,5 +1,6 @@
 ﻿using DG.Tweening;
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
@@ -9,32 +10,38 @@ public class UITransitionController: MonoBehaviour
 
     static UITransitionConfig slideConfig = Resources.Load<UITransitionConfig>("ScriptableObjects/SlideTransitionConfig");
     static UITransitionConfig slideAndZoomConfig = Resources.Load<UITransitionConfig>("ScriptableObjects/CombineSlideAndZoom");
-    public static void SlideTransition(Action callback)
+    public static IEnumerator SlideTransition(IEnumerator callback = null)
     {
         Sequence sequence = DOTween.Sequence();
         RectTransform slideInstance = Instantiate(slideConfig.intransitionRect, GameObject.Find("UI Canvas").transform);
         slideInstance.anchoredPosition = slideConfig.inConfig;
+
         sequence
             .SetUpdate(true)
-            .Append(slideInstance.DOAnchorPos(Vector2.zero, slideConfig.inDuration).SetUpdate(true))
-            .AppendCallback(() => callback?.Invoke())
+            .Append(slideInstance.DOAnchorPos(Vector2.zero, slideConfig.inDuration).SetUpdate(true));
+
+        yield return sequence.WaitForCompletion();
+        yield return callback;
+        sequence = DOTween.Sequence();
+        sequence
+            .SetUpdate(true)
             .Append(slideInstance.DOAnchorPos(slideConfig.outConfig, slideConfig.outDuration).SetUpdate(true).OnComplete(() =>
             {
                 Destroy(slideInstance.gameObject);
             }));
+
+        yield return sequence.WaitForCompletion();
     }
 
-    public static void SlideAndScaleTransition(Action callback)
+    public static IEnumerator SlideAndScaleTransition(Action callback)
     {
-        Transform parent = GameObject.Find("UI Canvas")?.transform;
-        if (parent == null) return;
+        Transform parent = GameObject.Find("UI Canvas").transform;
         RectTransform slideInstance = Instantiate(slideAndZoomConfig.intransitionRect, parent);
         slideInstance.anchoredPosition = slideAndZoomConfig.inConfig;
         Sequence sequence = DOTween.Sequence();
         sequence.SetUpdate(true)
             .Append(slideInstance.DOAnchorPos(Vector2.zero, slideAndZoomConfig.inDuration).SetUpdate(true))
             .AppendCallback(() => callback?.Invoke())
-            .AppendInterval(0.1f)
             .Append(slideInstance.DOAnchorPos(slideAndZoomConfig.outConfig, slideAndZoomConfig.outDuration).SetUpdate(true))
             .AppendCallback(() => Destroy(slideInstance.gameObject)).OnComplete(() =>
             {
@@ -44,7 +51,7 @@ public class UITransitionController: MonoBehaviour
                     Destroy(zoomInstance.gameObject);
                 });
             });
-        sequence.Play();
+        yield return sequence.AsyncWaitForCompletion();
     }
 
 

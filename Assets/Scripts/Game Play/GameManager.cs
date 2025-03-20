@@ -56,6 +56,7 @@ public class GameManager: Singleton<GameManager>
     {
         yield return new WaitForSecondsRealtime(duration);
         ScreenManager.Instance.TransitionTo(ScreenID.GameOverScreen);
+        Time.timeScale = 1;
     }
     void OnGamePaused(object[] datas)
     {
@@ -87,12 +88,12 @@ public class GameManager: Singleton<GameManager>
 
     void OnGobackToHomeScreen(object[] datas)
     {
-        UITransitionController.SlideAndScaleTransition(() =>
+        StartCoroutine(UITransitionController.SlideAndScaleTransition(() =>
         {
             Time.timeScale = 1;
-            ScreenManager.Instance.GoBack(isHidePrevScreen: false);
+            ScreenManager.Instance.GoBack();
             SceneManager.LoadScene("Menu Scene");
-        });
+        }));
     }
 
 

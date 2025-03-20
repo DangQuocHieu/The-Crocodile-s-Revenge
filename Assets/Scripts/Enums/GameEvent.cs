@@ -23,5 +23,8 @@ public enum GameEvent
     OnPlayerBeginRevive,
     OnPlayerFinishRevive,
     OnLeaderboardGet,
-    OnPlayerUpgradePowerup
+    OnPlayerUpgradePowerup,
+    OnPlayerLogin,
+    OnLoginSuccess,
+    OnLoginError
 }

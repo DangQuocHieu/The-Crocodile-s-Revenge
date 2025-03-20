@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,26 +24,24 @@ public class GameOverScreenController : UIScreen
         rectTransform = gameObject.GetComponent<RectTransform>();
     }
 
-    public override Tweener Hide()
+    public override IEnumerator Hide()
     {
         overlay.gameObject.SetActive(false);
-        UIAnimationController.Slide(rectTransform, isIn: false).OnComplete(() => { gameObject.SetActive(false); });
-        return null;
+        yield return UIAnimationController.Slide(rectTransform, isIn: false);
+        gameObject.SetActive(false);
     }
 
-    public override Tweener Show()
+    public override IEnumerator Show()
     {
         gameObject.SetActive(true);
         overlay.gameObject.SetActive(true);
-        UIAnimationController.Slide(rectTransform, isIn: true).OnComplete(() =>
-        {
-            int totalCoin = GameScreenController.Instance.CoinCollected;
-            UIAnimationController.CountUp(totalCoinText, totalCoin);
-            int totalDistance = GameManager.Instance.DistanceSoFar;
-            UIAnimationController.CountUp(totalDistanceText, totalDistance);
-            float totalTime = GameManager.Instance.TimeEpalsed;
-            UIAnimationController.CountUpTimer(gameTimeText, totalTime);
-        });
-        return null;
+        yield return UIAnimationController.Slide(rectTransform, isIn: true);
+        int totalCoin = GameScreenController.Instance.CoinCollected;
+        UIAnimationController.CountUp(totalCoinText, totalCoin);
+        int totalDistance = GameManager.Instance.DistanceSoFar;
+        UIAnimationController.CountUp(totalDistanceText, totalDistance);
+        float totalTime = GameManager.Instance.TimeEpalsed;
+        UIAnimationController.CountUpTimer(gameTimeText, totalTime);
+
     }
 }

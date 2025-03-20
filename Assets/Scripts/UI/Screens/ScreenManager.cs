@@ -17,6 +17,7 @@ public class ScreenManager : Singleton<ScreenManager>
     [SerializeField] UIScreen gameOverScreen;
     [SerializeField] UIScreen leaderboardScreen;
     [SerializeField] UIScreen accountScreen;
+    [SerializeField] UIScreen registerScreen;
     Stack<ScreenID> stackScreen = new Stack<ScreenID>();
 
     [SerializeField] TextMeshProUGUI countdownTimerText;
@@ -33,7 +34,8 @@ public class ScreenManager : Singleton<ScreenManager>
         screens.Add(ScreenID.GameOverScreen, gameOverScreen);
         screens.Add(ScreenID.LeaderboardScreen, leaderboardScreen);
         screens.Add(ScreenID.AccountScreen, accountScreen);
-        TransitionTo(ScreenID.HomeScreen);
+        screens.Add(ScreenID.RegisterScreen, registerScreen);
+        TransitionTo(ScreenID.AccountScreen);
         Observer.AddObserver(GameEvent.OnGameResume, UpdateCountdownUI);
     }
 
@@ -47,27 +49,31 @@ public class ScreenManager : Singleton<ScreenManager>
         {
             return;
         }
+        StartCoroutine(TransitionToCoroutine(screenId));
+
+    }
+    IEnumerator TransitionToCoroutine(ScreenID screenId)
+    {
         UIScreen currentScreen = (stackScreen.Count > 0) ? screens[stackScreen.Peek()] : null;
         UIScreen screenToShow = screens[screenId];
-        screenToShow.Show().OnComplete(() =>
-        {
-            if (currentScreen != null)
-            {
-                currentScreen.Hide();
-            }
-        });
-        
+        yield return StartCoroutine(screenToShow.Show());
+        if(currentScreen != null)
+        yield return StartCoroutine(currentScreen.Hide());
         stackScreen.Push(screenId);
     }
-
-    public void GoBack(bool isHidePrevScreen = true)
+    public void GoBack()
     {
         if (stackScreen.Count <= 1) return;
+        StartCoroutine(GoBackCoroutine());
+
+    }
+
+    IEnumerator GoBackCoroutine()
+    {
         UIScreen currentScreen = screens[stackScreen.Pop()];
-        currentScreen.Hide();
         UIScreen previousScreen = screens[stackScreen.Peek()];
-        if(!isHidePrevScreen)
-        previousScreen.Show();
+        yield return StartCoroutine(previousScreen.Show());
+        yield return StartCoroutine(currentScreen.Hide());
     }
 
     public void UpdateCountdownUI(object[] datas)

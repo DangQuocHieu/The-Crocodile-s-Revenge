@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -28,17 +29,17 @@ public class PauseScreenController : UIScreen
         });
     }
 
-    public override Tweener Hide()
+    public override IEnumerator Hide()
     {
         overlay.SetActive(false);
         gameObject.SetActive(false);
-        return null;
+        yield return null;
     }
 
-    public override Tweener Show()
+    public override IEnumerator Show()
     {
         overlay.SetActive(true);
         gameObject.SetActive(true);
-        return null;
+        yield return null;
     }
 }

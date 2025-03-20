@@ -1,6 +1,7 @@
 using DG.Tweening;
 using NUnit.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -13,6 +14,8 @@ public class UpgardeScreenController : UIScreen
     [SerializeField] Button upgradeTripleJumpButton;
     [SerializeField] Button upgradeDoubleCoinButton;
     [SerializeField] Button backButton;
+
+    private CanvasGroup canvasGroup;
 
     private void Awake()
     {
@@ -36,21 +39,33 @@ public class UpgardeScreenController : UIScreen
         {
             ScreenManager.Instance.GoBack();
         });
+        canvasGroup = GetComponent<CanvasGroup>();
+        canvasGroup.alpha = 0;
+        canvasGroup.interactable = false;
     }
-    public override Tweener Show()
+    public override IEnumerator Show()
     {
-        UITransitionController.SlideTransition(() => {
-            gameObject.SetActive(true); 
-        });
-        return null;
-
+        gameObject.SetActive(true);
+        yield return StartCoroutine(UITransitionController.SlideTransition(ShowCallback()));
     }
 
-    public override Tweener Hide()
+    IEnumerator ShowCallback()
     {
-        UITransitionController.SlideTransition(() => {
-            gameObject.SetActive(false); });
-        return null;
+        canvasGroup.alpha = 1;
+        canvasGroup.interactable = true;
+        yield return null;
+    }
+
+    public override IEnumerator Hide()
+    {
+        yield return StartCoroutine(UITransitionController.SlideTransition(HideCallback()));
     }
     
+    IEnumerator HideCallback()
+    {
+        yield return null;
+        gameObject.SetActive(false);
+        canvasGroup.alpha = 0;
+        canvasGroup.interactable = false;
+    }
 }

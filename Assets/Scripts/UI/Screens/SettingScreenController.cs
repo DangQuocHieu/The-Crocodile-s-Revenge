@@ -1,12 +1,12 @@
 using DG.Tweening;
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SettingScreenController : UIScreen
 {
     [SerializeField] Button backButton;
-    [SerializeField] float delayDuration = 0.2f;
     RectTransform rectTransform;
     private void Awake()
     {
@@ -14,16 +14,15 @@ public class SettingScreenController : UIScreen
         rectTransform = GetComponent<RectTransform>();
     }
 
-    public override Tweener Show()
+    public override IEnumerator Show()
     {
         gameObject.SetActive(true);
-        UIAnimationController.Slide(rectTransform, isIn: true);
-        return null;
+        yield return UIAnimationController.Slide(rectTransform, isIn: true).WaitForCompletion();
     }
-    public override Tweener Hide()
+    public override IEnumerator Hide()
     {
-        UIAnimationController.Slide(rectTransform, isIn: false).OnComplete(() => { gameObject.SetActive(false); });
-        return null;
+        yield return UIAnimationController.Slide(rectTransform, isIn: false).WaitForCompletion();
+        gameObject.SetActive(false);
     }
 
 }
