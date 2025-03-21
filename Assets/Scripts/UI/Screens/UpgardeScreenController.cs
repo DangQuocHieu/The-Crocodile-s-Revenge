@@ -59,12 +59,12 @@ public class UpgardeScreenController : UIScreen
     public override IEnumerator Hide()
     {
         yield return StartCoroutine(UITransitionController.SlideTransition(HideCallback()));
+        gameObject.SetActive(false);
     }
     
     IEnumerator HideCallback()
     {
         yield return null;
-        gameObject.SetActive(false);
         canvasGroup.alpha = 0;
         canvasGroup.interactable = false;
     }

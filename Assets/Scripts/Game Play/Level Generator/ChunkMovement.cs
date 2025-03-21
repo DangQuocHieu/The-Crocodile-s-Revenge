@@ -12,6 +12,8 @@ public class ChunkMovement : MonoBehaviour
         Observer.AddObserver(GameEvent.OnGameOver, StopMoving);
         Observer.AddObserver(GameEvent.OnPlayerBeginRevive, StopMoving);
         Observer.AddObserver(GameEvent.OnPlayerFinishRevive, ContinueMoving);
+        Observer.AddObserver(GameEvent.OnGamePaused, StopMoving);
+        Observer.AddObserver(GameEvent.OnGameResume, ContinueMoving);
     }
     private void FixedUpdate()
     {
@@ -32,6 +34,9 @@ public class ChunkMovement : MonoBehaviour
     {
         Observer.RemoveListener(GameEvent.OnGameOver, StopMoving);
         Observer.RemoveListener(GameEvent.OnPlayerBeginRevive, StopMoving);
+        Observer.RemoveListener(GameEvent.OnPlayerFinishRevive, ContinueMoving);
+        Observer.RemoveListener(GameEvent.OnGamePaused, StopMoving);
+        Observer.RemoveListener(GameEvent.OnGameResume, ContinueMoving);
     }
 
 }

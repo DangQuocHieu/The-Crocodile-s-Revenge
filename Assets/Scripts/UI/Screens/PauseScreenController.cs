@@ -31,15 +31,15 @@ public class PauseScreenController : UIScreen
 
     public override IEnumerator Hide()
     {
+        yield return new WaitForEndOfFrame();
         overlay.SetActive(false);
         gameObject.SetActive(false);
-        yield return null;
     }
 
     public override IEnumerator Show()
     {
+        yield return new WaitForEndOfFrame();
         overlay.SetActive(true);
         gameObject.SetActive(true);
-        yield return null;
     }
 }

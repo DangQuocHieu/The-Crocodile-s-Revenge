@@ -17,6 +17,7 @@ public class GameOverScreenController : UIScreen
     {
         restartButton.onClick.AddListener(() => {
             Observer.Notify(GameEvent.OnGameRestart);
+            Debug.Log(Time.timeScale);
         });
         returnToTilescreenButton.onClick.AddListener(() => {
             Observer.Notify(GameEvent.OnGobackToHomeScreen);

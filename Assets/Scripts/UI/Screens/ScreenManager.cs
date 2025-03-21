@@ -61,18 +61,21 @@ public class ScreenManager : Singleton<ScreenManager>
         yield return StartCoroutine(currentScreen.Hide());
         stackScreen.Push(screenId);
     }
-    public void GoBack()
+    public void GoBack(bool isShowPrevScreen = false)
     {
         if (stackScreen.Count <= 1) return;
-        StartCoroutine(GoBackCoroutine());
+        StartCoroutine(GoBackCoroutine(isShowPrevScreen));
 
     }
 
-    IEnumerator GoBackCoroutine()
+    IEnumerator GoBackCoroutine(bool isShowPrevScreen)
     {
         UIScreen currentScreen = screens[stackScreen.Pop()];
         UIScreen previousScreen = screens[stackScreen.Peek()];
-        yield return StartCoroutine(previousScreen.Show());
+        if(isShowPrevScreen)
+        {
+            yield return StartCoroutine(previousScreen.Show());
+        }
         yield return StartCoroutine(currentScreen.Hide());
     }
 

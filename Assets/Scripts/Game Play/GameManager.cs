@@ -19,7 +19,8 @@ public class GameManager: Singleton<GameManager>
     public float TimeEpalsed => timeElapsed;
     protected override void Awake()
     {
-        instance = this;
+        base.Awake();
+        DontDestroyOnLoad(gameObject);
         Time.timeScale = 1;
         Observer.AddObserver(GameEvent.OnGameOver, OnGameOver);
         Observer.AddObserver(GameEvent.OnGamePaused, OnGamePaused);
@@ -78,24 +79,35 @@ public class GameManager: Singleton<GameManager>
 
     void OnGameRestart(object[] datas)
     {
-        UITransitionController.SlideAndScaleTransition( () =>
-        {
-            Time.timeScale = 1f;
-            SceneManager.LoadScene("Game Scene");
-            ScreenManager.Instance.GoBack();
-        });
-    }
+        Debug.Log("Game Restart");
+        Time.timeScale = 1f;
+        StartCoroutine(UITransitionController.SlideTransition(OnGameRestartCallback()));
 
+    }
+    IEnumerator OnGameRestartCallback()
+    {
+        ScreenManager.Instance.GoBack();
+        AsyncOperation asyncOperation =  SceneManager.LoadSceneAsync("Game Scene");
+        while(!asyncOperation.isDone)
+        {
+            yield return null;
+        }
+    }
     void OnGobackToHomeScreen(object[] datas)
     {
-        StartCoroutine(UITransitionController.SlideAndScaleTransition(() =>
+        Time.timeScale = 1f;
+        StartCoroutine(UITransitionController.SlideTransition(OnGobackToHomeScreenCallback()));
+    }   
+
+    IEnumerator OnGobackToHomeScreenCallback()
+    {
+        ScreenManager.Instance.GoBack(isShowPrevScreen: true);
+        AsyncOperation asyncOperation = SceneManager.LoadSceneAsync("Menu Scene");
+        while(!asyncOperation.isDone)
         {
-            Time.timeScale = 1;
-            ScreenManager.Instance.GoBack();
-            SceneManager.LoadScene("Menu Scene");
-        }));
+            yield return null;
+        }
     }
 
 
- 
 }

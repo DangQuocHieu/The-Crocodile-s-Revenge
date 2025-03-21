@@ -15,6 +15,8 @@ public class HomeScreenController : UIScreen
     [SerializeField] private Button exitButton;
     [SerializeField] private Button statisticButton;
     [SerializeField] private Button accountButton;
+
+    private CanvasGroup canvasGroup;
     private void Awake()
     {
         playButton.onClick.AddListener(StartGame);
@@ -29,20 +31,38 @@ public class HomeScreenController : UIScreen
         {
             ScreenManager.Instance.TransitionTo(ScreenID.AccountScreen);
         });
+        canvasGroup = GetComponent<CanvasGroup>();  
     }
     void StartGame()
     {
         Observer.Notify(GameEvent.OnGameStart);
         Time.timeScale = 1;
-        StartCoroutine(UITransitionController.SlideAndScaleTransition(() =>
-        {
-            StartCoroutine(Hide());
-            SceneManager.LoadSceneAsync("Game Scene");
-        }));
+        StartCoroutine(StartGameCoroutine());
     }
+    IEnumerator StartGameCoroutine()
+    {
+        yield return UITransitionController.SlideTransition(StartGameCallback());
+        gameObject.SetActive(false);
+    }
+    public IEnumerator StartGameCallback()
+    {
+        AsyncOperation asyncOperation = SceneManager.LoadSceneAsync("Game Scene");
+        while(!asyncOperation.isDone)
+        {
+            yield return null;
+        }
+        if(asyncOperation.isDone)
+        {
+            canvasGroup.alpha = 0;
+            canvasGroup.interactable = false;
+        }
+    }
+
     public override IEnumerator Show()
     {
         gameObject.SetActive(true);
+        canvasGroup.alpha = 1;
+        canvasGroup.interactable = true;
         yield return null;
     }
 
