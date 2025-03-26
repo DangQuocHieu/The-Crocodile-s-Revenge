@@ -7,37 +7,32 @@ using UnityEngine;
 
 public class PlayFabManager : Singleton<PlayFabManager>
 {
-    public bool IsRememberId
-    {
-        get
-        {
-            return PlayerPrefs.HasKey("RememberId");
-        }
-    }
-
     private int coins = 0;
     public int Coins => coins;
     private string currentUsername = "";
     public string CurrentUserName => currentUsername;
+
+    private string sessionId;
     protected override void Awake()
     {
+        sessionId = Guid.NewGuid().ToString();
         base.Awake();
         DontDestroyOnLoad(this);
         Observer.AddObserver(GameEvent.OnPlayerLogin, OnPlayerLogin);
         Observer.AddObserver(GameEvent.OnPlayerLogOut, OnPlayerLogOut);
         Observer.AddObserver(GameEvent.OnRecoverPassword, OnRecoverPassword);   
-        if(IsRememberId)
-        {
-            StartCoroutine(AutoLogin());
-        }
+        Observer.AddObserver(GameEvent.OnOtherPlayerLogin, OnOtherPlayerLogin);
 
     }
 
+
     private void OnDestroy()
     {
-        Observer.AddObserver(GameEvent.OnPlayerLogin, OnPlayerLogin);
+        Observer.RemoveListener(GameEvent.OnPlayerLogin, OnPlayerLogin);
         Observer.RemoveListener(GameEvent.OnPlayerLogOut, OnPlayerLogOut);
         Observer.RemoveListener(GameEvent.OnRecoverPassword, OnRecoverPassword);
+        Observer.RemoveListener(GameEvent.OnOtherPlayerLogin, OnOtherPlayerLogin);
+
     }
 
     public void OnPlayerLogin(object[] datas)
@@ -52,16 +47,21 @@ public class PlayFabManager : Singleton<PlayFabManager>
         bool isDone = false, isError = false;
         PlayFabClientAPI.LoginWithPlayFab(new LoginWithPlayFabRequest{
             Username = username,
-            Password = password
+            Password = password,
+            InfoRequestParameters = new GetPlayerCombinedInfoRequestParams
+            {
+                GetUserData = true
+            }
         }, result =>{
             Guid guid = new Guid();
-            PlayFabClientAPI.LinkCustomID(new LinkCustomIDRequest
+            PlayFabClientAPI.UpdateUserData(new UpdateUserDataRequest
             {
-                CustomId = guid.ToString(),
-                ForceLink = true
+                Data = new Dictionary<string, string> 
+                {
+                    {"SessionToken", guid.ToString()}
+                }
             }, result => {
-                Debug.Log("Link custom id success");
-                PlayerPrefs.SetString("RememberId", guid.ToString());
+               
                 isDone = true;
                 
             }, error => {
@@ -77,35 +77,71 @@ public class PlayFabManager : Singleton<PlayFabManager>
         StartCoroutine(UITransitionController.SlideTransition(OnPlayerLoginCallback()));
     }
 
+    IEnumerator UpdateSessionId()
+    {
+        var request = new UpdateUserDataRequest() 
+        {
+            Data = new Dictionary<string, string> 
+            {
+                {"SessionId", sessionId}
+            }
+        };
+        bool isDone = false, isError = false;
+        PlayFabClientAPI.UpdateUserData(request, result =>
+        {
+            isDone = true;
+        }, error => {
+            isError = true;
+            OnError(error);
+        });
+
+        if(isError) yield break;
+        yield return new WaitUntil(()=>isDone);
+    }
+
+    public IEnumerator CheckSessionIdRoutine()
+    {
+        while(true)
+        {
+            yield return new WaitForSecondsRealtime(10f);
+            if(PlayFabClientAPI.IsClientLoggedIn())
+            {
+                PlayFabClientAPI.GetUserData(new GetUserDataRequest(){
+
+                }, result => {
+                    if(result.Data.ContainsKey("SessionId") && result.Data["SessionId"].Value != sessionId)
+                    {
+                        Observer.Notify(GameEvent.OnOtherPlayerLogin, "Another device logged in! Log out...");
+                    }
+                }, 
+                error => {
+                    OnError(error);
+                });
+            }
+            
+        }
+    }
+    
+    void OnOtherPlayerLogin(object[] datas)
+    {
+        StartCoroutine(OnOtherPlayerLoginCoroutine());
+    }
+
+    IEnumerator OnOtherPlayerLoginCoroutine()
+    {
+        yield return new WaitForSecondsRealtime(3f);
+        Observer.Notify(GameEvent.OnPlayerLogOut);
+    }
+
     IEnumerator OnPlayerLoginCallback()
     {
+        yield return UpdateSessionId();
         yield return GetVirtualCurrencies();
         yield return LoadPlayerData();
         yield return  GetUserName();
         Observer.Notify(GameEvent.OnLoginSuccessfully);
+        StartCoroutine(CheckSessionIdRoutine());
 
-    }
-    public IEnumerator AutoLogin()
-    {
-        bool isDone = false, isError = false;
-        string id = PlayerPrefs.GetString("RememberId");
-        PlayFabClientAPI.LoginWithCustomID(new LoginWithCustomIDRequest
-        {
-            CustomId = id,
-            CreateAccount = false
-        }, result =>
-        {
-            isDone = true;          
-        }, error => {
-            isError = true;
-            OnError(error);
-        });   
-        if(isError) yield break;
-        yield return new WaitUntil(()=>isDone);    
-        yield return GetUserName(); 
-        yield return LoadPlayerData();
-        yield return GetVirtualCurrencies();
-        Observer.Notify(GameEvent.OnLoginSuccessfully);
     }
         
     public IEnumerator GetUserName()
@@ -318,20 +354,18 @@ public class PlayFabManager : Singleton<PlayFabManager>
     }
     public void OnPlayerLogOut(object[] datas)
     {
-        PlayFabClientAPI.ForgetAllCredentials();
         StartCoroutine(LogOutCoroutine());
     }
 
     IEnumerator LogOutCoroutine()
     {
         PlayFabClientAPI.ForgetAllCredentials();
-        PlayerPrefs.DeleteKey("RememberId");
         yield return UITransitionController.SlideTransition(LogOutCallback());
     }
 
     IEnumerator LogOutCallback()
     {
-        ScreenManager.Instance.GoBack(isShowPrevScreen: true); 
+        ScreenManager.Instance.OnLogOut();
         yield return null;
     }
     public void OnRecoverPassword(object[] datas)
@@ -385,4 +419,6 @@ public class PlayFabManager : Singleton<PlayFabManager>
         if(isError) yield break;
         yield return new WaitUntil(()=>isDone);
     }
+
+    
 }

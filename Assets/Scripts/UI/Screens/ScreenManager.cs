@@ -1,10 +1,7 @@
-﻿
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-
-[System.Serializable]
 public class ScreenManager : Singleton<ScreenManager>
 {
     [SerializeField] Dictionary<ScreenID, UIScreen> screens = new Dictionary<ScreenID, UIScreen>();
@@ -43,10 +40,8 @@ public class ScreenManager : Singleton<ScreenManager>
         Observer.AddObserver(GameEvent.OnGameResume, UpdateCountdownUI);
         Observer.AddObserver(GameEvent.OnPlayFabError, OnPlayFabError);
         Observer.AddObserver(GameEvent.OnConfirmNotification, OnConfirmNotification);
-        if(!PlayerPrefs.HasKey("RememberId"))
-        {
-            TransitionTo(ScreenID.LoginScreen);
-        }
+        Observer.AddObserver(GameEvent.OnOtherPlayerLogin, OnOtherPlayerLogin);
+        TransitionTo(ScreenID.LoginScreen);
     }
 
     private void OnDestroy()
@@ -55,6 +50,7 @@ public class ScreenManager : Singleton<ScreenManager>
         Observer.RemoveListener(GameEvent.OnGameResume, UpdateCountdownUI);
         Observer.RemoveListener(GameEvent.OnPlayFabError, OnPlayFabError);
         Observer.RemoveListener(GameEvent.OnConfirmNotification, OnConfirmNotification);
+        Observer.RemoveListener(GameEvent.OnOtherPlayerLogin, OnOtherPlayerLogin);
     }
     public void TransitionTo(ScreenID screenId)
     {
@@ -78,9 +74,11 @@ public class ScreenManager : Singleton<ScreenManager>
     {
         UIScreen currentScreen = (stackScreen.Count > 0) ? screens[stackScreen.Peek()] : null;
         UIScreen screenToShow = screens[screenId];
-        yield return StartCoroutine(screenToShow.Show());
-        if(currentScreen != null && hidePrevScreen)
-        yield return StartCoroutine(currentScreen.Hide());
+        yield return screenToShow.Show();
+        if(currentScreen != null)
+        {
+            if(hidePrevScreen) yield return currentScreen.Hide();
+        }
         stackScreen.Push(screenId);
     }
 
@@ -142,6 +140,7 @@ public class ScreenManager : Singleton<ScreenManager>
     {
         string errorMessage = (string)datas[0];
         errorScreen.GetComponent<ErrorScreenController>().SetErrorMessage(errorMessage);
+        errorScreen.GetComponent<ErrorScreenController>().SetBackButton(false);
         ShowPopUp(ScreenID.ErrorScreen);
     }
 
@@ -157,4 +156,19 @@ public class ScreenManager : Singleton<ScreenManager>
         TransitionTo(ScreenID.HomeScreen);
     }
 
+
+    public void OnLogOut()
+    {
+        errorScreen.gameObject.SetActive(false);
+        stackScreen.Clear();
+        TransitionTo(ScreenID.LoginScreen);
+    }
+
+    void OnOtherPlayerLogin(object[] datas)
+    {
+        string errorMessage = (string)datas[0];
+        errorScreen.GetComponent<ErrorScreenController>().SetErrorMessage(errorMessage);
+        errorScreen.GetComponent<ErrorScreenController>().SetBackButton(false);
+        ShowPopUp(ScreenID.ErrorScreen);
+    }
 }

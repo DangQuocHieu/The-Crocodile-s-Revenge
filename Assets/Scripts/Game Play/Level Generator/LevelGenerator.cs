@@ -111,7 +111,7 @@ public class LevelGenerator : MonoBehaviour, IDifficultyScaler
         if(Random.value <= zeroDistanceXRate)
         {
             float prevChunkPositionY = currentChunk.transform.position.y;
-            return new Vector2(endPoint.position.x, prevChunkPositionY);
+            return new Vector2(endPoint.position.x - 0.1f, prevChunkPositionY);
         }
         else
         {

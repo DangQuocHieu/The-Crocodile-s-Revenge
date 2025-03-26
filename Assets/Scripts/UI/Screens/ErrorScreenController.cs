@@ -24,6 +24,13 @@ public class ErrorScreenController : UIScreen
     {
         errorText.text = message;
     }
+
+    public void SetBackButton(bool active)
+    {
+        backButton.gameObject.SetActive(active);
+    }
+
+
     public override IEnumerator Show()
     {   
         gameObject.SetActive(true);

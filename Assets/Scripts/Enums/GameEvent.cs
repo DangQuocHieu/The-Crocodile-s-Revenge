@@ -32,5 +32,6 @@ public enum GameEvent
     OnPlayerLand,
     OnVehicleWarning,
     OnDisableVehicleWarning,
-    OnConfirmNotification
+    OnConfirmNotification,
+    OnOtherPlayerLogin
 }
