@@ -1,11 +1,7 @@
-﻿using NUnit.Framework;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Audio;
-using UnityEngine.SceneManagement;
 
 public class AudioManager : Singleton<AudioManager>
 {
@@ -27,7 +23,8 @@ public class AudioManager : Singleton<AudioManager>
         DontDestroyOnLoad(gameObject);
         InitializeAudioSourcePool();
         ApplyAudioMixer();
-        Observer.AddObserver(GameEvent.OnGameStart, PlayStartSFX);
+        Observer.AddObserver(GameEvent.OnLoginSuccessfully, PlayMenuMusic);
+        Observer.AddObserver(GameEvent.OnGameStart, PlayGameMusic);
         Observer.AddObserver(GameEvent.OnGamePaused, PauseSFX);
         Observer.AddObserver(GameEvent.OnGameResume, ResumeSFX);
         Observer.AddObserver(GameEvent.OnPlayerPickUpCoin, PlayCoinSFX);
@@ -35,17 +32,17 @@ public class AudioManager : Singleton<AudioManager>
         Observer.AddObserver(GameEvent.OnPowerdown, PlayPowerdownSFX);
         Observer.AddObserver(GameEvent.OnObstacleHitPlayer, PlayHurtSFX);
         Observer.AddObserver(GameEvent.OnPlayerJump, PlayJumpSFX);
-        Observer.AddObserver(GameEvent.OnGameOver, PlayGameOverSFX);
         Observer.AddObserver(GameEvent.OnPlayerMultipleJump, PlayMultipleJumpSFX);
         Observer.AddObserver(GameEvent.OnPlayerBeginRevive, PlayHurtSFX);
         Observer.AddObserver(GameEvent.OnPlayerBeginRevive, PauseMusic);
         Observer.AddObserver(GameEvent.OnPlayerFinishRevive, ContinuePlayMusic);
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        Observer.AddObserver(GameEvent.OnVehicleWarning, PlayWarningSFX);
     }
 
     private void OnDestroy()
     {
-        Observer.RemoveListener(GameEvent.OnGameStart, PlayStartSFX);
+        Observer.RemoveListener(GameEvent.OnLoginSuccessfully, PlayMenuMusic);
+        Observer.RemoveListener(GameEvent.OnGameStart, PlayGameMusic);
         Observer.RemoveListener(GameEvent.OnGamePaused, PauseSFX);
         Observer.RemoveListener(GameEvent.OnGameResume, ResumeSFX);
         Observer.RemoveListener(GameEvent.OnPlayerPickUpCoin, PlayCoinSFX);
@@ -54,24 +51,13 @@ public class AudioManager : Singleton<AudioManager>
         Observer.RemoveListener(GameEvent.OnObstacleHitPlayer, PlayHurtSFX);
         Observer.RemoveListener(GameEvent.OnPlayerJump, PlayJumpSFX);
         Observer.RemoveListener(GameEvent.OnPlayerMultipleJump, PlayMultipleJumpSFX);
-        Observer.RemoveListener(GameEvent.OnGameOver, PlayGameOverSFX);
         Observer.RemoveListener(GameEvent.OnPlayerBeginRevive, PlayHurtSFX);
         Observer.RemoveListener(GameEvent.OnPlayerBeginRevive, PauseMusic);
         Observer.RemoveListener(GameEvent.OnPlayerFinishRevive, ContinuePlayMusic);
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        Observer.RemoveListener(GameEvent.OnVehicleWarning, PlayWarningSFX);
+        
     }
 
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        if (scene.name == "Menu Scene")
-        {
-            PlayMusic(AudioName.MenuMusic);
-        }
-        else if (scene.name == "Game Scene")
-        {
-            PlayMusic(AudioName.GameMusic);
-        }
-    }
     void ApplyAudioMixer()
     {
         foreach (var source in sfxAudioSourcePool.Values)
@@ -92,15 +78,6 @@ public class AudioManager : Singleton<AudioManager>
             AudioSource.pitch = audio.pitch;
             AudioSource.priority = audio.priority;
             sfxAudioSourcePool.Add(audio.audioName, AudioSource);   
-        }
-        foreach(var audio in musicAudios)
-        {
-            AudioSource AudioSource = gameObject.AddComponent<AudioSource>();
-            AudioSource.clip = audio.clip;
-            AudioSource.loop = true;
-            AudioSource.volume = audio.volume;
-            AudioSource.pitch = audio.pitch;
-            sfxAudioSourcePool.Add(audio.audioName, AudioSource);
         }
         musicSource = gameObject.AddComponent<AudioSource>();
     }
@@ -141,6 +118,10 @@ public class AudioManager : Singleton<AudioManager>
         musicSource.UnPause();
     }
 
+    public void StopMusic()
+    {
+        musicSource.Stop();
+    }
     public void ResumeSFX(object[] datas)
     {
         float delayDuration = (float)datas[0];
@@ -205,23 +186,25 @@ public class AudioManager : Singleton<AudioManager>
         PlaySFX(AudioName.MultipleJumpSFX);
     }
 
-    void PlayGameOverSFX(object[] datas)
+    public void PlayGameOverSFX()
     {
-        float duration = (float)datas[0];
-        StartCoroutine(PlayGameOverSFXCoroutine(duration));
+        StartCoroutine(PlayGameOverSFXCoroutine(0));
     }
     
     IEnumerator PlayGameOverSFXCoroutine(float duration)
     {
-        musicSource.Stop();
         yield return new WaitForSecondsRealtime(duration);
         AudioListener.pause = false;
         PlaySFX(AudioName.GameOverSFX);
     }
-    public void PlayStartSFX(object[] datas)
+    public void PlayStartSFX()
     {
         musicSource.Stop();
         PlaySFX(AudioName.GameStartSFX);
     }
 
+    public void PlayWarningSFX(object[] datas)
+    {
+        PlaySFX(AudioName.WarningSFX);
+    }
 }

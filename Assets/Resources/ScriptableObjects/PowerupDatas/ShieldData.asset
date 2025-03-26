@@ -16,3 +16,5 @@ MonoBehaviour:
   baseDuration: 8
   durationIncreasePerLevel: 1
   maxLevel: 5
+  prices: e80300008813000010270000204e000050c30000
+  sprite: {fileID: 2341536110440916619, guid: 58148f3548ec43c42921bb20fd7122de, type: 3}

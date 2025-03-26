@@ -13,7 +13,6 @@ public class PowerUpEffect : MonoBehaviour
     private Coroutine tripleJumpCoroutine = null;
     private Coroutine shieldCoroutine = null;
     private Coroutine magnetCoroutine = null;
-    private bool paused = false;
     private void Awake()
     {
         Observer.AddObserver(GameEvent.OnPlayerPickupTripleJumpPowerUp, OnPickupTripleJumpPowerUp);

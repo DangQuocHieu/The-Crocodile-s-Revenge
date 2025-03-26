@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class LeaderboardScreen : UIScreen
 {
     [SerializeField] RectTransform overlay;
-    [SerializeField] Button returnButton;
+    [SerializeField] Button backButton;
     [SerializeField] GameObject tableContent;
     [SerializeField] RectTransform tableRowPrefab;
     RectTransform rectTransform;
@@ -17,7 +17,7 @@ public class LeaderboardScreen : UIScreen
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
-        returnButton.onClick.AddListener(() => { ScreenManager.Instance.GoBack(); });
+        backButton.onClick.AddListener(() => { ScreenManager.Instance.HidePopUp(); });
         Observer.AddObserver(GameEvent.OnLeaderboardGet, DisplayLeaderboard);
     }
 
@@ -29,13 +29,13 @@ public class LeaderboardScreen : UIScreen
     {
         overlay.gameObject.SetActive(true);
         gameObject.SetActive(true);
-        yield return UIAnimationController.ScaleUIAnimation(rectTransform, isIn: true);
+        yield return UIAnimationController.ScaleUIAnimation(rectTransform, isIn: true).WaitForCompletion();
     }
 
     public override IEnumerator Hide()
     {
         overlay.gameObject.SetActive(false);
-        yield return UIAnimationController.ScaleUIAnimation(rectTransform, isIn: false);
+        yield return UIAnimationController.ScaleUIAnimation(rectTransform, isIn: false).WaitForCompletion();
         gameObject.SetActive(false);
     }
 

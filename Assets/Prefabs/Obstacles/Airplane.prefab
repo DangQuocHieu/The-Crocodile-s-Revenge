@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4235214003083018096}
   - component: {fileID: 2786507577546032458}
   - component: {fileID: 6727547276800366142}
-  - component: {fileID: 5785522557866568651}
+  - component: {fileID: 7390493716097017406}
   m_Layer: 0
   m_Name: Airplane
   m_TagString: Untagged
@@ -108,7 +108,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 6
---- !u!114 &5785522557866568651
+--- !u!114 &7390493716097017406
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -117,18 +117,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 8696710556704079433}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e54245091fc89048bb06bf3b063dc4f, type: 3}
+  m_Script: {fileID: 11500000, guid: bc291b9113f92404885eff8ddb045d1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
   hurtDuration: 3
   destroyEffectDuration: 0.5
-  dealDamageSound: 0
-  takeDamageSound: 0
+  dealDamageSound: 5
+  takeDamageSound: 5
   destroyOnHit: 1
-  cooldownSFX: 0
-  effects: []
-  coinPrefab: {fileID: 8936325105785966958, guid: a36291dcb4474d041b095f40e3fb9ebb, type: 3}
+  cooldownSFX: 1
+  effects:
+  - {fileID: 1352044221993270207, guid: 00f1e9e62e6ca3042a8c55ba25e689b4, type: 3}
+  speed: 15
+  distanceToWarning: 50
 --- !u!1001 &9024969750956987930
 PrefabInstance:
   m_ObjectHideFlags: 0

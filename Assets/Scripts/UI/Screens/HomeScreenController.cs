@@ -1,6 +1,7 @@
 using DG.Tweening;
 using DG.Tweening.Core;
 using System.Collections;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,33 +16,59 @@ public class HomeScreenController : UIScreen
     [SerializeField] private Button exitButton;
     [SerializeField] private Button statisticButton;
     [SerializeField] private Button accountButton;
+    [Header("Text")]
+    [SerializeField] private TextMeshProUGUI coinsText;
+    [SerializeField] private TextMeshProUGUI usernameText;
 
     private CanvasGroup canvasGroup;
     private void Awake()
     {
-        playButton.onClick.AddListener(StartGame);
-        settingButton.onClick.AddListener(() => { ScreenManager.Instance.TransitionTo(ScreenID.SettingScreen); });
-        upgradeButton.onClick.AddListener(() => { ScreenManager.Instance.TransitionTo(ScreenID.UpgradeScreen); });
+        canvasGroup = GetComponent<CanvasGroup>();  
+        playButton.onClick.AddListener(()=>{
+            AudioManager.Instance.PlayStartSFX();
+            canvasGroup.interactable = false;
+            StartGame();
+        });
+        settingButton.onClick.AddListener(() => { 
+            ScreenManager.Instance.ShowPopUp(ScreenID.SettingScreen); 
+            canvasGroup.interactable = false;
+        });
+        upgradeButton.onClick.AddListener(() => { 
+            ScreenManager.Instance.TransitionTo(ScreenID.UpgradeScreen); 
+            canvasGroup.interactable = false;
+        });
         statisticButton.onClick.AddListener(() =>
         {
             PlayFabManager.Instance.GetLeaderboard();
-            ScreenManager.Instance.TransitionTo(ScreenID.LeaderboardScreen);
+            ScreenManager.Instance.ShowPopUp(ScreenID.LeaderboardScreen);
+            canvasGroup.interactable = false;
         });
         accountButton.onClick.AddListener(() =>
-        {
-            ScreenManager.Instance.TransitionTo(ScreenID.AccountScreen);
+        {   
+            AudioManager.Instance.StopMusic();
+            Observer.Notify(GameEvent.OnPlayerLogOut);
+            canvasGroup.interactable = false;
         });
-        canvasGroup = GetComponent<CanvasGroup>();  
+        
+    }
+ 
+    void OnDestroy()
+    {
+    
+    }
+    void Update()
+    {
+        coinsText.text = PlayFabManager.Instance.Coins.ToString();
+        usernameText.text = PlayFabManager.Instance.CurrentUserName.ToString();
     }
     void StartGame()
     {
-        Observer.Notify(GameEvent.OnGameStart);
-        Time.timeScale = 1;
         StartCoroutine(StartGameCoroutine());
     }
     IEnumerator StartGameCoroutine()
     {
-        yield return UITransitionController.SlideTransition(StartGameCallback());
+        yield return PlayFabManager.Instance.LoadPlayerData();
+        yield return UITransitionController.SlideAndScaleTransition(StartGameCallback());
         gameObject.SetActive(false);
     }
     public IEnumerator StartGameCallback()
@@ -55,6 +82,7 @@ public class HomeScreenController : UIScreen
         {
             canvasGroup.alpha = 0;
             canvasGroup.interactable = false;
+            Observer.Notify(GameEvent.OnGameStart);
         }
     }
 
@@ -70,6 +98,12 @@ public class HomeScreenController : UIScreen
     {
         gameObject.SetActive(false);
         yield return null;
+    }
+
+    public void DisplayCoinText(object[] datas)
+    {
+        int coins = (int)datas[0];
+        coinsText.text = coins.ToString();
     }
 
 

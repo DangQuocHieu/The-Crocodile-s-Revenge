@@ -1,47 +1,29 @@
-using DG.Tweening;
-using NUnit.Framework;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Data.Common;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UpgardeScreenController : UIScreen
 {
-    [SerializeField] Button upgradeMagnetButton;
-    [SerializeField] Button upgradeShieldButton;
-    [SerializeField] Button upgradeTripleJumpButton;
-    [SerializeField] Button upgradeDoubleCoinButton;
+    [SerializeField] TextMeshProUGUI coinsText;
     [SerializeField] Button backButton;
 
     private CanvasGroup canvasGroup;
-
     private void Awake()
     {
-        upgradeMagnetButton.onClick.AddListener(() =>
-        {
-            Observer.Notify(GameEvent.OnPlayerUpgradePowerup, PowerupType.Magnet);
-        });
-        upgradeShieldButton.onClick.AddListener(() =>
-        {
-            Observer.Notify(GameEvent.OnPlayerUpgradePowerup, PowerupType.Shield);
-        });
-        upgradeTripleJumpButton.onClick.AddListener(() =>
-        {
-            Observer.Notify(GameEvent.OnPlayerUpgradePowerup, PowerupType.TripleJump);
-        });
-        upgradeDoubleCoinButton.onClick.AddListener(() =>
-        {
-            Observer.Notify(GameEvent.OnPlayerUpgradePowerup, PowerupType.DoubleCoin);
-        });
         backButton.onClick.AddListener(() =>
         {
-            ScreenManager.Instance.GoBack();
+            ScreenManager.Instance.GoBack(isShowPrevScreen: true);
+            canvasGroup.interactable = false;
         });
         canvasGroup = GetComponent<CanvasGroup>();
         canvasGroup.alpha = 0;
         canvasGroup.interactable = false;
+    }
+    void Update()
+    {
+        coinsText.text = PlayFabManager.Instance.Coins.ToString();
     }
     public override IEnumerator Show()
     {
@@ -68,4 +50,6 @@ public class UpgardeScreenController : UIScreen
         canvasGroup.alpha = 0;
         canvasGroup.interactable = false;
     }
+
+
 }

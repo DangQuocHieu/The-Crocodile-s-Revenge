@@ -39,9 +39,9 @@ public class GameOverScreenController : UIScreen
         yield return UIAnimationController.Slide(rectTransform, isIn: true);
         int totalCoin = GameScreenController.Instance.CoinCollected;
         UIAnimationController.CountUp(totalCoinText, totalCoin);
-        int totalDistance = GameManager.Instance.DistanceSoFar;
+        int totalDistance = StatisticsManager.Instance.DistanceSoFar;
         UIAnimationController.CountUp(totalDistanceText, totalDistance);
-        float totalTime = GameManager.Instance.TimeEpalsed;
+        float totalTime = StatisticsManager.Instance.TimeEpalsed;
         UIAnimationController.CountUpTimer(gameTimeText, totalTime);
 
     }

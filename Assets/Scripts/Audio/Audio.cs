@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 
 public enum AudioName
 {
@@ -14,7 +15,8 @@ public enum AudioName
     GameOverSFX,
     GameStartSFX,
     SpikeBrokenSFX,
-    None
+    None,
+    WarningSFX
 }
 
 [System.Serializable]

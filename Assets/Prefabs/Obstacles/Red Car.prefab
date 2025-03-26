@@ -50,13 +50,14 @@ MonoBehaviour:
   damage: 1
   hurtDuration: 3
   destroyEffectDuration: 0.5
-  dealDamageSound: 12
-  takeDamageSound: 12
+  dealDamageSound: 5
+  takeDamageSound: 5
   destroyOnHit: 1
-  cooldownSFX: 0
-  effects: []
-  coinPrefab: {fileID: 8936325105785966958, guid: a36291dcb4474d041b095f40e3fb9ebb, type: 3}
-  speed: 10
+  cooldownSFX: 1
+  effects:
+  - {fileID: 1352044221993270207, guid: 00f1e9e62e6ca3042a8c55ba25e689b4, type: 3}
+  speed: 15
+  distanceToWarning: 50
 --- !u!61 &5062195041292291020
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -91,7 +92,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 3.8390574, y: -0.45185554}
+  m_Offset: {x: 0, y: -0.66472936}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -101,7 +102,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 4.654622, y: 1.785145}
+  m_Size: {x: 4.654622, y: 1.514977}
   m_EdgeRadius: 0
 --- !u!50 &2217239982835518945
 Rigidbody2D:
@@ -129,7 +130,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 6
 --- !u!1001 &2379547453736681013
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -142,13 +143,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: RedCar
       objectReference: {fileID: 0}
+    - target: {fileID: 3626916397498700004, guid: fdd4552fb95ecb0418a53de0cb5b5aba, type: 3}
+      propertyPath: m_SortingLayer
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3626916397498700004, guid: fdd4552fb95ecb0418a53de0cb5b5aba, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 930711723
+      objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: fdd4552fb95ecb0418a53de0cb5b5aba, type: 3}
       propertyPath: m_LocalScale.x
       value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: fdd4552fb95ecb0418a53de0cb5b5aba, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.72
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: fdd4552fb95ecb0418a53de0cb5b5aba, type: 3}
       propertyPath: m_LocalPosition.y

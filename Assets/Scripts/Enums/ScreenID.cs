@@ -1,5 +1,5 @@
 public enum ScreenID
 {
     HomeScreen, SettingScreen, UpgradeScreen, PauseScreen, GameOverScreen, LeaderboardScreen,
-    AccountScreen, RegisterScreen
+    LoginScreen, RegisterScreen, ErrorScreen, RecoverPasswordScreen, ConfrimScreen
 }

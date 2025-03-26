@@ -1,19 +1,15 @@
+using System.Collections;
 using UnityEngine;
 
 public class DataPersistenceManager : Singleton<DataPersistenceManager>
 {
-    private GameData gameData;
+    private GameData gameData = new GameData();
     public GameData GameData => gameData;
 
     protected override void Awake()
     {
         base.Awake();
         DontDestroyOnLoad(gameObject);
-        Observer.AddObserver(GameEvent.OnPlayerUpgradePowerup, OnUpgrade);
-    }
-    private void OnDestroy()
-    {
-        Observer.RemoveListener(GameEvent.OnPlayerUpgradePowerup, OnUpgrade);
     }
     
     public void LoadGame(GameData gameData)
@@ -21,9 +17,8 @@ public class DataPersistenceManager : Singleton<DataPersistenceManager>
         this.gameData = gameData; 
     }
 
-    public void OnUpgrade(object[] datas)
+    public void Upgrade(PowerupType type)
     {
-        PowerupType type = (PowerupType)datas[0];
         switch (type)
         {
             case PowerupType.Shield:
@@ -39,7 +34,6 @@ public class DataPersistenceManager : Singleton<DataPersistenceManager>
                 ++gameData.tripleJumpLevel;
                 break;
         }
-        PlayFabManager.Instance.SavePlayerData();
     }
 
 }

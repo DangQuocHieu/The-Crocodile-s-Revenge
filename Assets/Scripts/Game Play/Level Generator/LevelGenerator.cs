@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
-public class LevelGenerator : MonoBehaviour
+public class LevelGenerator : MonoBehaviour, IDifficultyScaler
 {
     [Header("Chunk Prefabs")]
     [SerializeField] GameObject[] chunkPrefabs;
@@ -16,7 +16,10 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField] GameObject chunkWithPowerups;
     [Header("Chunk Distance")]
     [SerializeField] int[] ChunkDistancesY;
-    [SerializeField] int[] chunkDistancesX;
+    [SerializeField] int minDistaneX = 2;
+    [SerializeField] int maxDistanceX = 8;
+    [SerializeField] float zeroDistanceXRate = 0.5f;
+    [SerializeField] int currentMaxDistanceX;
     [Header("Some Chunk Properties")]
     [SerializeField] int minimumChunkIndexToChoose;
     [SerializeField] int currentChunkIndexToChoose;
@@ -25,15 +28,14 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField] int minPowerupAppearanceRate = 5;
     [SerializeField] int maxPowerupAppearanceRate = 20;
     [SerializeField] int endPointIndex = 0;
-
     int currentPowerupApperanceRate;
     private Vector2 spawnPosition;
-    List<GameObject> chunkSpawned = new List<GameObject>();
+    LinkedList<GameObject> chunkSpawned = new LinkedList<GameObject>();
     int counter;
 
     private void Awake()
     {
-        Observer.AddObserver(GameEvent.OnGameDifficultyIncreasing, OnDifficultyIncreasing);
+        Observer.AddObserver(GameEvent.OnGameDifficultyIncreasing, OnIncreaseDifficulty);
         currentChunkIndexToChoose = minimumChunkIndexToChoose;
         spawnPosition = new Vector2(0, ChunkDistancesY[Random.Range(0, ChunkDistancesY.Length)]);
         counter = 0;
@@ -44,13 +46,18 @@ public class LevelGenerator : MonoBehaviour
         SpawnStartingChunks();
     }
 
-    private void Update()
+    void LateUpdate()
     {
         DestroyChunk();
     }
+
+    void OnDestroy()
+    {
+        Observer.RemoveListener(GameEvent.OnGameDifficultyIncreasing, OnIncreaseDifficulty);
+    }
     void SpawnStartingChunks()
     {
-        chunkSpawned.Add(SpawnChunk(spawnPosition, initialChunk));
+        chunkSpawned.AddLast(SpawnChunk(spawnPosition, initialChunk));
 
         for(int i=0;i<chunkCount;i++)
         {
@@ -63,16 +70,14 @@ public class LevelGenerator : MonoBehaviour
                 counter = 0;
             }
             else chunkToSpawn = SpawnChunk(spawnPosition, chunkPrefabs[Random.Range(0, currentChunkIndexToChoose)]);
-            chunkSpawned.Add(chunkToSpawn);
+            chunkSpawned.AddLast(chunkToSpawn);
             ++counter;
         }
     }
    
     void DestroyChunk()
     {
-        for(int i=0;i<chunkSpawned.Count;i++)
-        {
-            GameObject currentChunk = chunkSpawned[i];
+            GameObject currentChunk = chunkSpawned.First.Value;
             if (currentChunk.transform.position.x <= destroyPositionX)
             {
                 spawnPosition = CalculateSpawnPosition();
@@ -87,12 +92,11 @@ public class LevelGenerator : MonoBehaviour
                 {
                     chunkToSpawn = SpawnChunk(spawnPosition, chunkPrefabs[Random.Range(0, currentChunkIndexToChoose)]);
                 }
-                chunkSpawned.Remove(currentChunk);
-                chunkSpawned.Add(chunkToSpawn);
+                chunkSpawned.RemoveFirst();
+                chunkSpawned.AddLast(chunkToSpawn);
                 Destroy(currentChunk);
                 ++counter;
             }
-        }
     }
 
     GameObject SpawnChunk(Vector3 spawnPosition, GameObject chunkPrefab)
@@ -101,23 +105,26 @@ public class LevelGenerator : MonoBehaviour
     }
     Vector3 CalculateSpawnPosition()
     {
-        Transform endPoint = chunkSpawned[chunkSpawned.Count - 1].transform.GetChild(endPointIndex);
-        int chunkDistanceX = chunkDistancesX[Random.Range(0, chunkDistancesX.Length)];
-        if(chunkDistanceX == 0)
+        GameObject currentChunk = chunkSpawned.Last.Value;
+        Transform endPoint = currentChunk.transform.GetChild(endPointIndex);
+        
+        if(Random.value <= zeroDistanceXRate)
         {
-            float prevChunkPositionY = chunkSpawned[chunkSpawned.Count - 1].transform.position.y;
+            float prevChunkPositionY = currentChunk.transform.position.y;
             return new Vector2(endPoint.position.x, prevChunkPositionY);
         }
         else
         {
+            int chunkDistanceX = Random.Range(minDistaneX, maxDistanceX + 1);
             return new Vector3(endPoint.position.x + chunkDistanceX, ChunkDistancesY[Random.Range(0, ChunkDistancesY.Length)]);
         }
     }
 
-    void OnDifficultyIncreasing(object[] datas)
+    public void OnIncreaseDifficulty(object[] datas)
     {
-        float timeElapsed = (float)datas[0];
-        float difficultyDuration = (float)datas[1];
-        currentChunkIndexToChoose = (Mathf.FloorToInt(Mathf.Lerp(minimumChunkIndexToChoose, chunkPrefabs.Length, timeElapsed / difficultyDuration)));
+        float t = (float)datas[0];
+        float difficultyScale = (float)datas[1];
+        currentChunkIndexToChoose = Mathf.RoundToInt(Mathf.Lerp(minimumChunkIndexToChoose, chunkPrefabs.Length, t));
+        currentMaxDistanceX = Mathf.RoundToInt(Mathf.Lerp(maxDistanceX, maxDistanceX * difficultyScale, t));
     }
 }

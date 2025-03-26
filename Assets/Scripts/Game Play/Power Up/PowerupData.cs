@@ -7,4 +7,6 @@ public class PowerupData : ScriptableObject
     public float baseDuration;
     public float durationIncreasePerLevel;
     public int maxLevel;
+    public int[] prices; 
+    public Sprite sprite;
 }

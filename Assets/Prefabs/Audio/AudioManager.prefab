@@ -96,6 +96,11 @@ MonoBehaviour:
     volume: 1
     pitch: 1
     priority: 128
+  - audioName: 13
+    clip: {fileID: 8300000, guid: f3c81b77beee89e44940d35149bd25ff, type: 3}
+    volume: 1
+    pitch: 1
+    priority: 128
   musicAudios:
   - audioName: 0
     clip: {fileID: 8300000, guid: 68d8ab6a593175949aad46f7c1c8152f, type: 3}

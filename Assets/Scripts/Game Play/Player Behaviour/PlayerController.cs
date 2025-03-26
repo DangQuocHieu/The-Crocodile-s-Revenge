@@ -7,12 +7,12 @@ public class PlayerController : Singleton<PlayerController>
 {
     [SerializeField] Vector3 initPosition = new Vector3(0, -6, 0);
     [SerializeField] float jumpForce = 8f;
-    [SerializeField] float speed = 10f;
     [SerializeField] Animator playerAnim;
     [SerializeField] CapsuleCollider2D bodyCollider;
     [SerializeField] LayerMask groundLayerMask;
     [SerializeField] float extraHeightCheck = 0.01f;
     [SerializeField] float minVeclocityY;
+    [SerializeField] float minPositionY = -10f;
     int jumpCount;
     Rigidbody2D playerRb;
     PowerUpEffect powerUpEffect;
@@ -37,6 +37,10 @@ public class PlayerController : Singleton<PlayerController>
     }
     private void Update()
     {
+        if(transform.position.y < minPositionY)
+        {
+            Observer.Notify(GameEvent.OnPlayerFallIntoAHole);
+        }
         //if (Input.touchCount > 0)
         //{
         //    Touch touch = Input.GetTouch(0);

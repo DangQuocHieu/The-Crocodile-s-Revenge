@@ -23,8 +23,14 @@ public enum GameEvent
     OnPlayerBeginRevive,
     OnPlayerFinishRevive,
     OnLeaderboardGet,
-    OnPlayerUpgradePowerup,
     OnPlayerLogin,
-    OnLoginSuccess,
-    OnLoginError
+    OnLoginSuccessfully,
+    OnPlayFabError, 
+    OnPlayerLogOut,
+    OnRecoverPassword,
+    OnPlayerFallIntoAHole,
+    OnPlayerLand,
+    OnVehicleWarning,
+    OnDisableVehicleWarning,
+    OnConfirmNotification
 }

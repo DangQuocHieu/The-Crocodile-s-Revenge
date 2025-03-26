@@ -10,10 +10,10 @@ public class GameData
 
     public GameData()
     {
-        this.shieldLevel = 1;
-        this.tripleJumpLevel = 1;
-        this.magnetLevel = 1;
-        this.doublecoinLevel = 1;
+        this.shieldLevel = 0;
+        this.tripleJumpLevel = 0;
+        this.magnetLevel = 0;
+        this.doublecoinLevel = 0;
     }
     public GameData(int shieldLevel, int tripleJumpLevel, int magnetLevel, int doublecoinLevel)
     {

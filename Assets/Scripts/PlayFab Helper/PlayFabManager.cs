@@ -1,48 +1,127 @@
-﻿using PlayFab;
+using PlayFab;
 using PlayFab.ClientModels;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayFabManager : Singleton<PlayFabManager>
 {
-    [SerializeField] TextMeshProUGUI currentPlayerText;
-    private string currentId = "";
+    public bool IsRememberId
+    {
+        get
+        {
+            return PlayerPrefs.HasKey("RememberId");
+        }
+    }
+
+    private int coins = 0;
+    public int Coins => coins;
+    private string currentUsername = "";
+    public string CurrentUserName => currentUsername;
     protected override void Awake()
     {
         base.Awake();
         DontDestroyOnLoad(this);
         Observer.AddObserver(GameEvent.OnPlayerLogin, OnPlayerLogin);
+        Observer.AddObserver(GameEvent.OnPlayerLogOut, OnPlayerLogOut);
+        Observer.AddObserver(GameEvent.OnRecoverPassword, OnRecoverPassword);   
+        if(IsRememberId)
+        {
+            StartCoroutine(AutoLogin());
+        }
 
     }
 
     private void OnDestroy()
     {
-        Observer.RemoveListener(GameEvent.OnPlayerLogin, OnPlayerLogin);
+        Observer.AddObserver(GameEvent.OnPlayerLogin, OnPlayerLogin);
+        Observer.RemoveListener(GameEvent.OnPlayerLogOut, OnPlayerLogOut);
+        Observer.RemoveListener(GameEvent.OnRecoverPassword, OnRecoverPassword);
     }
-    private void Update()
-    {
-        if(currentPlayerText != null)
-        currentPlayerText.text = "CURRENT USER: "+ currentId.ToString();
-    }
-
 
     public void OnPlayerLogin(object[] datas)
     {
-        string username = (string)datas[0];
-        string password = (string)datas[1];
-        Login(username, password);
+        string username = (string) datas[0];
+        string password = (string) datas[1];
+        StartCoroutine(OnPlayerLoginCoroutine(username, password));
     }
-    public void GetUser()
+
+    public IEnumerator OnPlayerLoginCoroutine(string username, string password)
     {
+        bool isDone = false, isError = false;
+        PlayFabClientAPI.LoginWithPlayFab(new LoginWithPlayFabRequest{
+            Username = username,
+            Password = password
+        }, result =>{
+            Guid guid = new Guid();
+            PlayFabClientAPI.LinkCustomID(new LinkCustomIDRequest
+            {
+                CustomId = guid.ToString(),
+                ForceLink = true
+            }, result => {
+                Debug.Log("Link custom id success");
+                PlayerPrefs.SetString("RememberId", guid.ToString());
+                isDone = true;
+                
+            }, error => {
+                OnError(error);
+                isError = true;
+            });
+        }, error => {
+            OnError(error);
+            isError = true;
+        });
+        if(isError) yield break;
+        yield return new WaitUntil(() => isDone);
+        StartCoroutine(UITransitionController.SlideTransition(OnPlayerLoginCallback()));
+    }
+
+    IEnumerator OnPlayerLoginCallback()
+    {
+        yield return GetVirtualCurrencies();
+        yield return LoadPlayerData();
+        yield return  GetUserName();
+        Observer.Notify(GameEvent.OnLoginSuccessfully);
+
+    }
+    public IEnumerator AutoLogin()
+    {
+        bool isDone = false, isError = false;
+        string id = PlayerPrefs.GetString("RememberId");
+        PlayFabClientAPI.LoginWithCustomID(new LoginWithCustomIDRequest
+        {
+            CustomId = id,
+            CreateAccount = false
+        }, result =>
+        {
+            isDone = true;          
+        }, error => {
+            isError = true;
+            OnError(error);
+        });   
+        if(isError) yield break;
+        yield return new WaitUntil(()=>isDone);    
+        yield return GetUserName(); 
+        yield return LoadPlayerData();
+        yield return GetVirtualCurrencies();
+        Observer.Notify(GameEvent.OnLoginSuccessfully);
+    }
+        
+    public IEnumerator GetUserName()
+    {
+        bool isDone = false, isError = false;
         PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest(), result =>
         {
-            currentId = result.AccountInfo.PlayFabId;
-        }, OnError);
+            currentUsername = result.AccountInfo.Username;
+            isDone = true;
+        }, error => {
+            OnError(error);
+            isError = true;
+        });
+        if(isError) yield break;
+        yield return new WaitUntil(() => isDone);
+        Debug.Log("CurrentUser: " + currentUsername);
     }
 
     public void Register(string username, string password, string email)
@@ -52,85 +131,119 @@ public class PlayFabManager : Singleton<PlayFabManager>
             Email = email,
             Username = username,
             Password = password,
+            DisplayName = username,
             RequireBothUsernameAndEmail = true
         };
         PlayFabClientAPI.RegisterPlayFabUser(request, OnRegisterSuccess, OnError);
     }
 
-    public void Login(string username, string password)
-    {
-        var request = new LoginWithPlayFabRequest
-        {
-            Username = username,
-            Password = password
-        };
-        PlayFabClientAPI.LoginWithPlayFab(request, result =>
-        {
-            Observer.Notify(GameEvent.OnLoginSuccess, result);
-            LoadPlayerData();
-            Debug.Log("Login Successfully");
-        }, error =>
-        {
-            Debug.Log(error.GenerateErrorReport());
-            Observer.Notify(GameEvent.OnLoginError, error);
-        });
-    }
+
 
     void OnError(PlayFabError error)
     {
-        Debug.Log(error.GenerateErrorReport());
-
+        string errorMessage = GetPlayFabErrorMessage(error);
+        Observer.Notify(GameEvent.OnPlayFabError, errorMessage);
     }
 
-    public void SendLeaderboard(int score)
+    private string GetPlayFabErrorMessage(PlayFabError error)
     {
-        var request = new UpdatePlayerStatisticsRequest
+        switch(error.Error)
         {
-            Statistics = new List<StatisticUpdate>
+            case PlayFabErrorCode.NameNotAvailable:
+                return "Name has already been registered";
+            case PlayFabErrorCode.EmailAddressNotAvailable:
+                return "Email has already been registered";
+            case PlayFabErrorCode.InvalidUsernameOrPassword:
+                return "Invalid user name or password";
+        }
+        return error.ErrorMessage;
+    }
+    
+    public IEnumerator SendLeaderboard(int score)
+    {
+        bool isDone = false;
+
+        PlayFabClientAPI.UpdatePlayerStatistics(new PlayFab.ClientModels.UpdatePlayerStatisticsRequest
+        {
+            Statistics = new List<PlayFab.ClientModels.StatisticUpdate>
             {
-                new StatisticUpdate
+                new PlayFab.ClientModels.StatisticUpdate
                 {
                     StatisticName = "Distance",
                     Value = score
                 }
             }
-        };
-        PlayFabClientAPI.UpdatePlayerStatistics(request, OnLeaderboardUpdate, OnError);
-    }
+        },
+        result => {
+            Debug.Log("Leaderboard updated successfully");
+            isDone = true;
+        },
+        error => {
+            Debug.LogError("Error updating leaderboard: " + error.GenerateErrorReport());
+            isDone = true;
+    });
 
-    void OnLeaderboardUpdate(UpdatePlayerStatisticsResult result)
-    {
-        Debug.Log("Successful leaderboard sent");
+        yield return new WaitUntil(() => isDone);
     }
-
     public void GetLeaderboard()
     {
-        var request = new GetLeaderboardRequest()
+        var request = new GetLeaderboardAroundPlayerRequest()
         {
             StatisticName = "Distance",
-            StartPosition = 0,
-            MaxResultsCount = 10
+            MaxResultsCount = 100
         };
-        PlayFabClientAPI.GetLeaderboard(request, OnLeaderboardGet, OnError);
+        PlayFabClientAPI.GetLeaderboardAroundPlayer(request, OnLeaderboardGet, OnError);
 
     }
-
-    private void OnLeaderboardGet(GetLeaderboardResult result)
+    private void OnLeaderboardGet(GetLeaderboardAroundPlayerResult result)
     {
         List<LeaderboardRow> leaderboards = new List<LeaderboardRow>();
         foreach (var item in result.Leaderboard)
         {
-            var leaderboardRow = new LeaderboardRow(item.Position, item.PlayFabId, item.StatValue);
+            var leaderboardRow = new LeaderboardRow(item.Position, item.DisplayName, item.StatValue);
+            if(item.DisplayName == currentUsername)
+            {
+                leaderboardRow = new LeaderboardRow(item.Position + 1, item.DisplayName + "(You)", item.StatValue);
+            } 
             leaderboards.Add(leaderboardRow);
         }
         Observer.Notify(GameEvent.OnLeaderboardGet, leaderboards);
-        Debug.Log("NO ERROR");
+        Debug.Log("NO ERROR");  
     }
 
-    public void SavePlayerData()
+    public IEnumerator RecoverPassword(string recoverEmail)
     {
+        bool isDone = false, isError = false;
+        PlayFabClientAPI.SendAccountRecoveryEmail(new SendAccountRecoveryEmailRequest
+        {
+            Email = recoverEmail,
+            TitleId = PlayFabSettings.TitleId
+        }, result =>
+        {
+            Debug.Log("Recovery email sent successfully");
+            isDone = true;
+        }, error =>
+        {
+            OnError(error);
+            isError = true;
+
+        });
+        if(isError) 
+        {
+            yield break;
+        }
+        yield return new WaitUntil(() => isDone);
+        Observer.Notify(GameEvent.OnConfirmNotification, "Password recovery email sent!");
+    }
+    public IEnumerator SavePlayerData()
+    {
+        if(!PlayFabClientAPI.IsClientLoggedIn())
+        {
+            yield break;
+        }
         GameData gameData = DataPersistenceManager.Instance.GameData;
-        if (gameData == null) return;
+        if (gameData == null) yield break;
+        bool isDone = false, isError = false;
         var request = new UpdateUserDataRequest()
         {
             Data = new Dictionary<string, string>
@@ -141,28 +254,42 @@ public class PlayFabManager : Singleton<PlayFabManager>
                 { "Shield", gameData.shieldLevel.ToString() }
             }
         }; 
-        PlayFabClientAPI.UpdateUserData(request, OnDataSend, OnError);
+        PlayFabClientAPI.UpdateUserData(request, result => {
+            isDone = true;
+            Debug.Log("Player data saved successfully");
+        }, error => {
+            OnError(error);
+            isError = true;
+        });
+        if(isError) yield break;
+        yield return new WaitUntil(() => isDone);
     }
 
-    public void LoadPlayerData()
+    public IEnumerator LoadPlayerData()
     {
-        PlayFabClientAPI.GetUserData(new GetUserDataRequest(), OnDataReceived, OnError);
+        GetUserDataResult userDataResult = null;
+        bool isDone = false, isError = false;
+        PlayFabClientAPI.GetUserData(new GetUserDataRequest(), result => {
+            userDataResult = result;
+            isDone = true;
+        }, error => {
+            OnError(error);
+            isError = true;
+        });
+        if(isError) yield break;
+        yield return new WaitUntil(() => isDone);
+        OnDataReceived(userDataResult);
     }
 
-    public void OnDataSend(UpdateUserDataResult result)
-    {
-        Debug.Log("Completely user data send !");
-
-    }
 
     public void OnDataReceived(GetUserDataResult result)
     {
-       
         if (result.Data != null)
         {
             if(result.Data.Count == 0)
             {
                 DataPersistenceManager.Instance.LoadGame(new GameData());
+                Debug.Log("Successful player data received");
                 return;
             }
             GameData gameData = new GameData(
@@ -182,27 +309,80 @@ public class PlayFabManager : Singleton<PlayFabManager>
 
     public void OnRegisterSuccess(RegisterPlayFabUserResult result)
     {
-        Debug.Log("Đăng ký thành công !");
-        
+        Observer.Notify(GameEvent.OnConfirmNotification, "You have registered successfully");
     }
-
-
 
     private void OnApplicationQuit()
     {
-        SavePlayerData();
+        StartCoroutine(SavePlayerData());
     }
-
-    void LoadMenuScene()
+    public void OnPlayerLogOut(object[] datas)
     {
-        StartCoroutine(LoadMenuSceneCoroutine());
+        PlayFabClientAPI.ForgetAllCredentials();
+        StartCoroutine(LogOutCoroutine());
     }
 
-    IEnumerator LoadMenuSceneCoroutine()
+    IEnumerator LogOutCoroutine()
     {
-        yield return new WaitForSecondsRealtime(2f);
-        SceneManager.LoadScene("Menu Scene");
+        PlayFabClientAPI.ForgetAllCredentials();
+        PlayerPrefs.DeleteKey("RememberId");
+        yield return UITransitionController.SlideTransition(LogOutCallback());
     }
-    
 
+    IEnumerator LogOutCallback()
+    {
+        ScreenManager.Instance.GoBack(isShowPrevScreen: true); 
+        yield return null;
+    }
+    public void OnRecoverPassword(object[] datas)
+    {
+        string recoverEmail = (string)datas[0];
+        StartCoroutine(RecoverPassword(recoverEmail));
+    }
+
+
+    public IEnumerator GetVirtualCurrencies()
+    {
+        bool isDone = false, isError = false;
+        PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(), result =>{
+            coins = result.VirtualCurrency["CN"];
+            isDone = true;
+        }, error => {
+            OnError(error);
+            isError = true;
+        });
+        if(isError) yield break;
+        yield return new WaitUntil(() => isDone);
+        Debug.Log("Currencies Get");
+    }
+
+    public IEnumerator BuyItem(int price)
+    {
+        bool isDone = false, isError = false;
+        PlayFabClientAPI.SubtractUserVirtualCurrency(new SubtractUserVirtualCurrencyRequest{
+            VirtualCurrency = "CN", Amount = price
+        }, result => {
+            isDone = true;
+        }, error => {
+            isError = true;
+            OnError(error);
+        });
+        if(isError) yield break;
+        yield return new WaitUntil(()=>isDone);
+    }
+
+    public IEnumerator AddCoins(int coinToAdd)
+    {
+        bool isDone = false, isError = false;
+        PlayFabClientAPI.AddUserVirtualCurrency(new AddUserVirtualCurrencyRequest{
+            VirtualCurrency = "CN", Amount = coinToAdd
+        }, result => {
+            isDone = true;
+        }, error => {
+            isError = true;
+            OnError(error);
+        });
+        if(isError) yield break;
+        yield return new WaitUntil(()=>isDone);
+    }
 }

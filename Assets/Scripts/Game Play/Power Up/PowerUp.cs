@@ -13,6 +13,7 @@ public abstract class PowerUp : MonoBehaviour, ICollectible
 
     public virtual void OnCollect()
     {
+        Debug.Log(currentDuration);
         Observer.Notify(GameEvent.OnPlayerPickUpPowerup, powerupData.type, currentDuration);
         Destroy(gameObject);
     }
