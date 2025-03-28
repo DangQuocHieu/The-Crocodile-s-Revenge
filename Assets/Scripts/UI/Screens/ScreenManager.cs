@@ -140,7 +140,7 @@ public class ScreenManager : Singleton<ScreenManager>
     {
         string errorMessage = (string)datas[0];
         errorScreen.GetComponent<ErrorScreenController>().SetErrorMessage(errorMessage);
-        errorScreen.GetComponent<ErrorScreenController>().SetBackButton(false);
+        errorScreen.GetComponent<ErrorScreenController>().SetBackButton(true);
         ShowPopUp(ScreenID.ErrorScreen);
     }
 

@@ -41,7 +41,7 @@ public class RegisterScreenController : UIScreen
     public void Register()
     {
         if(DataValidate.IsEmpty(usernameField.text, "Username") || DataValidate.IsEmpty(passwordField.text, "Password")
-        || !DataValidate.IsContainCharacterAndNumber(usernameField.text, "Username") || DataValidate.IsTooShort(passwordField.text, "Password")
+        || !DataValidate.IsStartWithLetter(usernameField.text, "Username") || DataValidate.IsTooShort(passwordField.text, "Password")
         || DataValidate.IsTooShort(usernameField.text, "Username"))
         {
             return;

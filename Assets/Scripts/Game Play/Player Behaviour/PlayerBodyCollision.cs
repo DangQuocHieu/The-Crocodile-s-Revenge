@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PlayerBodyCollision : MonoBehaviour
 {
-    [SerializeField] SpriteRenderer spriteRenderer;
+    [SerializeField] SpriteRenderer[] spriteRenderers;
     [SerializeField] bool isInvicible = false;
     public bool IsInvicible => isInvicible;
     private Coroutine hurtCoroutine;
@@ -57,11 +57,18 @@ public class PlayerBodyCollision : MonoBehaviour
         float blinkInterval = 0.1f;
         while (elapsedTime < hurtDuration)
         {
-            spriteRenderer.enabled = !spriteRenderer.enabled;
+            foreach(var sprite in spriteRenderers)
+            {
+                sprite.enabled = !sprite.enabled;
+            }
+            
             yield return new WaitForSeconds(blinkInterval);
             elapsedTime += blinkInterval;
         }
-        spriteRenderer.enabled = true;
+        foreach(var sprite in spriteRenderers)
+        {
+            sprite.enabled = true;
+        }
         isInvicible = false;
         hurtCoroutine = null;
     }
@@ -72,7 +79,10 @@ public class PlayerBodyCollision : MonoBehaviour
         {
             StopCoroutine(hurtCoroutine);
             hurtCoroutine = null;
-            spriteRenderer.enabled = true;
+            foreach(var sprite in spriteRenderers)
+            {
+                sprite.enabled = true;
+            }
         }
     }
 

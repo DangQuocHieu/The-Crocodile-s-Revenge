@@ -13,6 +13,8 @@ public class PlayFabManager : Singleton<PlayFabManager>
     public string CurrentUserName => currentUsername;
 
     private string sessionId;
+
+    private List<CatalogItem> catalogItems = new List<CatalogItem>();
     protected override void Awake()
     {
         sessionId = Guid.NewGuid().ToString();
@@ -139,6 +141,7 @@ public class PlayFabManager : Singleton<PlayFabManager>
         yield return GetVirtualCurrencies();
         yield return LoadPlayerData();
         yield return  GetUserName();
+        yield return GetCatalogItems();
         Observer.Notify(GameEvent.OnLoginSuccessfully);
         StartCoroutine(CheckSessionIdRoutine());
 
@@ -285,8 +288,8 @@ public class PlayFabManager : Singleton<PlayFabManager>
             Data = new Dictionary<string, string>
             {
                 { "Magnet", gameData.magnetLevel.ToString() },
-                { "Double Coin", gameData.doublecoinLevel.ToString() },
-                { "Triple Jump", gameData.tripleJumpLevel.ToString() },
+                { "X2Coins", gameData.doublecoinLevel.ToString() },
+                { "X3Jump", gameData.tripleJumpLevel.ToString() },
                 { "Shield", gameData.shieldLevel.ToString() }
             }
         }; 
@@ -322,17 +325,17 @@ public class PlayFabManager : Singleton<PlayFabManager>
     {
         if (result.Data != null)
         {
-            if(result.Data.Count == 0)
+            if(result.Data.Count <= 0)
             {
                 DataPersistenceManager.Instance.LoadGame(new GameData());
                 Debug.Log("Successful player data received");
                 return;
             }
             GameData gameData = new GameData(
-                shieldLevel: int.Parse(result.Data["Shield"].Value),
-                tripleJumpLevel: int.Parse(result.Data["Triple Jump"].Value),
-                magnetLevel: int.Parse(result.Data["Magnet"].Value),
-                doublecoinLevel: int.Parse(result.Data["Double Coin"].Value)
+                shieldLevel: result.Data.ContainsKey("Shield") ? int.Parse(result.Data["Shield"].Value) : 0,
+                tripleJumpLevel: result.Data.ContainsKey("X3Jump") ? int.Parse(result.Data["X3Jump"].Value) : 0,
+                magnetLevel: result.Data.ContainsKey("Magnet") ? int.Parse(result.Data["Magnet"].Value) : 0,
+                doublecoinLevel:    result.Data.ContainsKey("X2Coins") ? int.Parse(result.Data["X2Coins"].Value) : 0
             );
             DataPersistenceManager.Instance.LoadGame(gameData);
             Debug.Log("Successful player data received");
@@ -419,6 +422,25 @@ public class PlayFabManager : Singleton<PlayFabManager>
         if(isError) yield break;
         yield return new WaitUntil(()=>isDone);
     }
+    
+    IEnumerator GetCatalogItems()
+    {
+        bool isDone = false;
+        PlayFabClientAPI.GetCatalogItems(new GetCatalogItemsRequest()
+        {
+            CatalogVersion = "1"
+        }, result => {
+            foreach(var item in result.Catalog)
+            {
+                catalogItems.Add(item);
+                Debug.Log(item.ItemId + " " + item.VirtualCurrencyPrices + " " + item.DisplayName);
+            }
+            isDone = true;
+        }, error => {
+            OnError(error);
 
+        });
+        yield return new WaitUntil(()=>isDone);
+    }
     
 }

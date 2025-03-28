@@ -786,6 +786,10 @@ PrefabInstance:
       propertyPath: passwordField
       value: 
       objectReference: {fileID: 1317728056}
+    - target: {fileID: 3049833801035275338, guid: d300226f98ceff54e8a0305ae06cfc2a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4632967130718911262, guid: d300226f98ceff54e8a0305ae06cfc2a, type: 3}
       propertyPath: m_IsActive
       value: 0

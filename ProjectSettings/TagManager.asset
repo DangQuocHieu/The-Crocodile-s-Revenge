@@ -65,6 +65,15 @@ TagManager:
   - name: Player
     uniqueID: 3115914345
     locked: 0
+  - name: Player's Body
+    uniqueID: 1483957541
+    locked: 0
+  - name: Player's Head
+    uniqueID: 3186600005
+    locked: 0
+  - name: Player's Hat
+    uniqueID: 2839167719
+    locked: 0
   - name: Effect
     uniqueID: 584505773
     locked: 0

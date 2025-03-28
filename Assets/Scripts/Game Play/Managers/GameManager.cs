@@ -9,7 +9,6 @@ public class GameManager: Singleton<GameManager>
     {
         base.Awake();
         DontDestroyOnLoad(gameObject);
-        Time.timeScale = 1;
         Observer.AddObserver(GameEvent.OnGameOver, OnGameOver);
         Observer.AddObserver(GameEvent.OnGamePaused, OnGamePaused);
         Observer.AddObserver(GameEvent.OnGameResume, OnGameResume);
