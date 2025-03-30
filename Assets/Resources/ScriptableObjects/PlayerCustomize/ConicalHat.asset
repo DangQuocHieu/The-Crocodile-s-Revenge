@@ -10,9 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7e45ab88dde2d749b2af7ae82916db8, type: 3}
-  m_Name: Conical Hat Data
+  m_Name: ConicalHat
   m_EditorClassIdentifier: 
-  type: 2
+  id: Conical hat
+  price: 10000
+  owned: 0
+  hatSprite: {fileID: 21300000, guid: 2c24cc288a22dc74687a109e1284bb87, type: 3}
   runClip: {fileID: 7400000, guid: 429dcb99eb1f8de4ca65635943a70f9f, type: 2}
   jumpClip: {fileID: 7400000, guid: 8d53fc0e083a15a46a0aba478cced620, type: 2}
   dieClip: {fileID: 7400000, guid: 30d9292e911a90349acc988326147f6f, type: 2}

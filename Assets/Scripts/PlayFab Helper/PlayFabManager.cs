@@ -3,6 +3,7 @@ using PlayFab.ClientModels;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayFabManager : Singleton<PlayFabManager>
@@ -10,11 +11,17 @@ public class PlayFabManager : Singleton<PlayFabManager>
     private int coins = 0;
     public int Coins => coins;
     private string currentUsername = "";
-    public string CurrentUserName => currentUsername;
-
+    public string CurrentUserName 
+    {
+        get {
+            return currentUsername == null ? "" : currentUsername;
+        }
+    }
     private string sessionId;
-
     private List<CatalogItem> catalogItems = new List<CatalogItem>();
+    public List<CatalogItem> CatalogItems => catalogItems;
+    private List<string> ownedHats = new List<string>();
+    public List<string> OwnedHats => ownedHats;
     protected override void Awake()
     {
         sessionId = Guid.NewGuid().ToString();
@@ -24,7 +31,7 @@ public class PlayFabManager : Singleton<PlayFabManager>
         Observer.AddObserver(GameEvent.OnPlayerLogOut, OnPlayerLogOut);
         Observer.AddObserver(GameEvent.OnRecoverPassword, OnRecoverPassword);   
         Observer.AddObserver(GameEvent.OnOtherPlayerLogin, OnOtherPlayerLogin);
-
+        StartCoroutine(LoginAsAGuest());
     }
 
 
@@ -34,8 +41,31 @@ public class PlayFabManager : Singleton<PlayFabManager>
         Observer.RemoveListener(GameEvent.OnPlayerLogOut, OnPlayerLogOut);
         Observer.RemoveListener(GameEvent.OnRecoverPassword, OnRecoverPassword);
         Observer.RemoveListener(GameEvent.OnOtherPlayerLogin, OnOtherPlayerLogin);
-
     }
+
+    public IEnumerator LoginAsAGuest()
+    {
+        bool isDone = false;
+        PlayFabClientAPI.LoginWithCustomID(new LoginWithCustomIDRequest{
+            CustomId = SystemInfo.deviceUniqueIdentifier,
+            CreateAccount = true
+        },
+        result => {
+            isDone = true;
+        },
+        error=>{
+            OnError(error);
+        });
+        yield return new WaitUntil(()=>isDone);
+        yield return UpdateSessionId();
+        yield return GetVirtualCurrencies();
+        yield return LoadPlayerData();
+        yield return  GetUserName();
+        yield return GetCatalogItems();
+        yield return GetOwnedHats();
+        Observer.Notify(GameEvent.OnLoginSuccessfully);
+    }
+
 
     public void OnPlayerLogin(object[] datas)
     {
@@ -142,6 +172,7 @@ public class PlayFabManager : Singleton<PlayFabManager>
         yield return LoadPlayerData();
         yield return  GetUserName();
         yield return GetCatalogItems();
+        yield return GetOwnedHats();
         Observer.Notify(GameEvent.OnLoginSuccessfully);
         StartCoroutine(CheckSessionIdRoutine());
 
@@ -226,20 +257,20 @@ public class PlayFabManager : Singleton<PlayFabManager>
     }
     public void GetLeaderboard()
     {
-        var request = new GetLeaderboardAroundPlayerRequest()
+        var request = new GetLeaderboardRequest()
         {
             StatisticName = "Distance",
             MaxResultsCount = 100
         };
-        PlayFabClientAPI.GetLeaderboardAroundPlayer(request, OnLeaderboardGet, OnError);
+        PlayFabClientAPI.GetLeaderboard(request, OnLeaderboardGet, OnError);
 
     }
-    private void OnLeaderboardGet(GetLeaderboardAroundPlayerResult result)
+    private void OnLeaderboardGet(GetLeaderboardResult result)
     {
         List<LeaderboardRow> leaderboards = new List<LeaderboardRow>();
         foreach (var item in result.Leaderboard)
         {
-            var leaderboardRow = new LeaderboardRow(item.Position, item.DisplayName, item.StatValue);
+            var leaderboardRow = new LeaderboardRow(item.Position + 1, item.DisplayName, item.StatValue);
             if(item.DisplayName == currentUsername)
             {
                 leaderboardRow = new LeaderboardRow(item.Position + 1, item.DisplayName + "(You)", item.StatValue);
@@ -290,7 +321,8 @@ public class PlayFabManager : Singleton<PlayFabManager>
                 { "Magnet", gameData.magnetLevel.ToString() },
                 { "X2Coins", gameData.doublecoinLevel.ToString() },
                 { "X3Jump", gameData.tripleJumpLevel.ToString() },
-                { "Shield", gameData.shieldLevel.ToString() }
+                { "Shield", gameData.shieldLevel.ToString() },
+                { "HatEquippedId", gameData.hatEquippedId.ToString()}
             }
         }; 
         PlayFabClientAPI.UpdateUserData(request, result => {
@@ -335,7 +367,9 @@ public class PlayFabManager : Singleton<PlayFabManager>
                 shieldLevel: result.Data.ContainsKey("Shield") ? int.Parse(result.Data["Shield"].Value) : 0,
                 tripleJumpLevel: result.Data.ContainsKey("X3Jump") ? int.Parse(result.Data["X3Jump"].Value) : 0,
                 magnetLevel: result.Data.ContainsKey("Magnet") ? int.Parse(result.Data["Magnet"].Value) : 0,
-                doublecoinLevel:    result.Data.ContainsKey("X2Coins") ? int.Parse(result.Data["X2Coins"].Value) : 0
+                doublecoinLevel: result.Data.ContainsKey("X2Coins") ? int.Parse(result.Data["X2Coins"].Value) : 0,
+                hatEquippedId: result.Data.ContainsKey("HatEquippedId") ? result.Data["HatEquippedId"].Value.ToString() : "Empty"
+
             );
             DataPersistenceManager.Instance.LoadGame(gameData);
             Debug.Log("Successful player data received");
@@ -423,13 +457,14 @@ public class PlayFabManager : Singleton<PlayFabManager>
         yield return new WaitUntil(()=>isDone);
     }
     
-    IEnumerator GetCatalogItems()
+    public IEnumerator GetCatalogItems()
     {
         bool isDone = false;
         PlayFabClientAPI.GetCatalogItems(new GetCatalogItemsRequest()
         {
             CatalogVersion = "1"
         }, result => {
+            catalogItems = new List<CatalogItem>();
             foreach(var item in result.Catalog)
             {
                 catalogItems.Add(item);
@@ -443,4 +478,41 @@ public class PlayFabManager : Singleton<PlayFabManager>
         yield return new WaitUntil(()=>isDone);
     }
     
+    public IEnumerator BuyItem(string id, int price)
+    {
+        bool isDone = false, isError = true;
+        PlayFabClientAPI.PurchaseItem(new PurchaseItemRequest{
+            CatalogVersion = "1",
+            ItemId = id,
+            Price = price,
+            VirtualCurrency = "CN"
+        }, result => {
+            isDone = true;
+        }, error => {
+            OnError(error);
+            isError = true;
+        });
+        if(isError) yield break;
+        yield return new WaitUntil(()=>isDone);
+        Observer.Notify(GameEvent.OnConfirmNotification, "Purchase Successful");
+    }
+
+    public IEnumerator GetOwnedHats()
+    {
+        bool isDone = false, isError = false;
+        PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest{},
+        result => {
+            ownedHats = new List<string>();
+            foreach(var item in result.Inventory)
+            {
+                ownedHats.Add(item.ItemId);
+            }
+            isDone = true;
+        }, error => {
+            isError = true;
+            OnError(error);
+        });
+        if(isError) yield break;
+        yield return new WaitUntil(()=>isDone);
+    }
 }

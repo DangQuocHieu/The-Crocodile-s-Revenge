@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7e45ab88dde2d749b2af7ae82916db8, type: 3}
+  m_Name: StrawHat
+  m_EditorClassIdentifier: 
+  id: Straw hat
+  price: 5000
+  owned: 0
+  hatSprite: {fileID: 21300000, guid: 1ce2bba80a15dec408686fac451c0e38, type: 3}
+  runClip: {fileID: 7400000, guid: de21362fb3ef2df43931f3b4fd16317a, type: 2}
+  jumpClip: {fileID: 7400000, guid: 45b2abd0e384c474089ac9a42f7bbfa2, type: 2}
+  dieClip: {fileID: 7400000, guid: e5f673b44b98d68469a687545ef2cdbd, type: 2}

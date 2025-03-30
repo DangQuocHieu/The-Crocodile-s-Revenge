@@ -51,7 +51,7 @@ public class LeaderboardScreen : UIScreen
             RectTransform tableRow = Instantiate(tableRowPrefab, tableContent.transform);
             TextMeshProUGUI[] texts = tableRow.gameObject.GetComponentsInChildren<TextMeshProUGUI>();
             texts[0].text = row.place.ToString();
-            texts[1].text = row.name.ToString();
+            texts[1].text = row.name == null ? "" : row.name;
             texts[2].text = row.score.ToString();
         }
     }

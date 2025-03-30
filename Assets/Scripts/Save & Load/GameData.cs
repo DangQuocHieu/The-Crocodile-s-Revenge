@@ -7,6 +7,7 @@ public class GameData
     public int tripleJumpLevel;
     public int magnetLevel;
     public int doublecoinLevel;
+    public string hatEquippedId;
 
     public GameData()
     {
@@ -14,12 +15,14 @@ public class GameData
         this.tripleJumpLevel = 0;
         this.magnetLevel = 0;
         this.doublecoinLevel = 0;
+        this.hatEquippedId = "Empty";
     }
-    public GameData(int shieldLevel, int tripleJumpLevel, int magnetLevel, int doublecoinLevel)
+    public GameData(int shieldLevel, int tripleJumpLevel, int magnetLevel, int doublecoinLevel, string hatEquippedId)
     {
         this.shieldLevel = shieldLevel;
         this.tripleJumpLevel = tripleJumpLevel;
         this.magnetLevel = magnetLevel;
         this.doublecoinLevel = doublecoinLevel;
+        this.hatEquippedId = hatEquippedId;
     }
 }

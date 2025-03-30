@@ -10,9 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7e45ab88dde2d749b2af7ae82916db8, type: 3}
-  m_Name: Watermelon Hat Data
+  m_Name: WatermelonHat
   m_EditorClassIdentifier: 
-  type: 0
+  id: Watermelon hat
+  price: 5000
+  owned: 0
+  hatSprite: {fileID: 21300000, guid: f340ad31f4325aa428a5281a7f9a7643, type: 3}
   runClip: {fileID: 7400000, guid: 680a01fba3d5c0443a6a2206325c8c92, type: 2}
   jumpClip: {fileID: 7400000, guid: 6632fdcb6d3c73941bf588aa4bada0a5, type: 2}
   dieClip: {fileID: 7400000, guid: ebae28b8da6241a4fa9c950d4b1d80d3, type: 2}

@@ -16,6 +16,7 @@ public class HomeScreenController : UIScreen
     [SerializeField] private Button exitButton;
     [SerializeField] private Button statisticButton;
     [SerializeField] private Button accountButton;
+    [SerializeField] private Button shopButton;
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI coinsText;
     [SerializeField] private TextMeshProUGUI usernameText;
@@ -49,6 +50,10 @@ public class HomeScreenController : UIScreen
             Observer.Notify(GameEvent.OnPlayerLogOut);
             canvasGroup.interactable = false;
         });
+        shopButton.onClick.AddListener(() => { 
+            ScreenManager.Instance.TransitionTo(ScreenID.ShopScreen); 
+            canvasGroup.interactable = false;
+        });
         
     }
  
@@ -58,8 +63,7 @@ public class HomeScreenController : UIScreen
     }
     void Update()
     {
-        coinsText.text = PlayFabManager.Instance.Coins.ToString();
-        usernameText.text = PlayFabManager.Instance.CurrentUserName.ToString();
+        UpdateUI();
     }
     void StartGame()
     {
@@ -106,5 +110,10 @@ public class HomeScreenController : UIScreen
         coinsText.text = coins.ToString();
     }
 
+    void UpdateUI()
+    {
+        coinsText.text = PlayFabManager.Instance.Coins.ToString();
+        usernameText.text = PlayFabManager.Instance.CurrentUserName.ToString();
+    }
 
 }

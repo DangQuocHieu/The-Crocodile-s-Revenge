@@ -16,6 +16,7 @@ public class ConfirmScreenController : UIScreen
         rectTransform = GetComponent<RectTransform>();
         backButton.onClick.AddListener(()=>{
             ScreenManager.Instance.HidePopUp();
+            Observer.Notify(GameEvent.OnConfirmScreenClosed);
         });
     }
     public override IEnumerator Hide()

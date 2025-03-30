@@ -7,7 +7,6 @@ public class PlayerController : Singleton<PlayerController>
 {
     [SerializeField] Vector3 initPosition = new Vector3(0, -6, 0);
     [SerializeField] float jumpForce = 8f;
-    [SerializeField] Animator playerAnim;
     [SerializeField] CapsuleCollider2D bodyCollider;
     [SerializeField] LayerMask groundLayerMask;
     [SerializeField] float extraHeightCheck = 0.01f;
@@ -16,6 +15,7 @@ public class PlayerController : Singleton<PlayerController>
     int jumpCount;
     Rigidbody2D playerRb;
     PowerUpEffect powerUpEffect;
+    Animator playerAnimator;
     private bool wasGrounded;
     private bool isDisableControl = false;
     private bool isJumpRequested = false;
@@ -26,10 +26,15 @@ public class PlayerController : Singleton<PlayerController>
         playerRb = GetComponent<Rigidbody2D>();
         powerUpEffect = GetComponent<PowerUpEffect>();
         bodyCollider = GetComponent<CapsuleCollider2D>();
+        playerAnimator = GetComponent<Animator>();
         Observer.AddObserver(GameEvent.OnGameOver, UpdateGameOverAnimation);
         Observer.AddObserver(GameEvent.OnPlayerFinishRevive, OnFinishRevive);
     }
 
+    void Start()
+    {
+        playerAnimator.runtimeAnimatorController = PlayerCustomizationController.Instance.PlayerAnimatorController;
+    }
     private void OnDestroy()
     {
         Observer.RemoveListener(GameEvent.OnGameOver, UpdateGameOverAnimation);
@@ -95,7 +100,7 @@ public class PlayerController : Singleton<PlayerController>
             if (jumpCount == 0 || jumpCount >= powerUpEffect.CurrentMaxJumpCount) return;
         }
         playerRb.linearVelocity = new Vector2(0, jumpForce);
-        playerAnim.SetBool("isRunning", false);
+        playerAnimator.SetBool("isRunning", false);
         if (IsMultipleJump()) Observer.Notify(GameEvent.OnPlayerMultipleJump);
         else Observer.Notify(GameEvent.OnPlayerJump);
         ++jumpCount;
@@ -113,7 +118,7 @@ public class PlayerController : Singleton<PlayerController>
     }
     void UpdateAnimation()
     {
-        playerAnim.SetBool("isMultipleJump", jumpCount == powerUpEffect.CurrentMaxJumpCount);
+        playerAnimator.SetBool("isMultipleJump", jumpCount == powerUpEffect.CurrentMaxJumpCount);
     }
 
     void OnGrounded()
@@ -126,15 +131,15 @@ public class PlayerController : Singleton<PlayerController>
         if (!wasGrounded && isGrounded)
         {
             jumpCount = 0;
-            playerAnim.SetBool("isRunning", true);
+            playerAnimator.SetBool("isRunning", true);
         }
         wasGrounded = isGrounded;
     }
 
     void UpdateGameOverAnimation(object[] datas)
     {
-        if(playerAnim != null)
-        playerAnim.SetTrigger("Die");
+        if(playerAnimator != null)
+        playerAnimator.SetTrigger("Die");
         isDisableControl = true;
     }
 

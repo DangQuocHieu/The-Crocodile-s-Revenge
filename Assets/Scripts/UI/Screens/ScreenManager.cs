@@ -16,6 +16,8 @@ public class ScreenManager : Singleton<ScreenManager>
     [SerializeField] UIScreen recoverPasswordScreen;
     [SerializeField] UIScreen errorScreen;
     [SerializeField] UIScreen confirmScreen;
+
+    [SerializeField] UIScreen shopScreen;
     Stack<ScreenID> stackScreen = new Stack<ScreenID>();
 
     [SerializeField] TextMeshProUGUI countdownTimerText;
@@ -36,6 +38,7 @@ public class ScreenManager : Singleton<ScreenManager>
         screens.Add(ScreenID.RecoverPasswordScreen, recoverPasswordScreen);
         screens.Add(ScreenID.ErrorScreen, errorScreen);
         screens.Add(ScreenID.ConfrimScreen, confirmScreen);
+        screens.Add(ScreenID.ShopScreen, shopScreen);
         Observer.AddObserver(GameEvent.OnLoginSuccessfully, TransitionToHomeScreen);
         Observer.AddObserver(GameEvent.OnGameResume, UpdateCountdownUI);
         Observer.AddObserver(GameEvent.OnPlayFabError, OnPlayFabError);
@@ -68,7 +71,7 @@ public class ScreenManager : Singleton<ScreenManager>
         {
             return;
         }
-        StartCoroutine(TransitionToCoroutine(screenId,  false));
+        StartCoroutine(TransitionToCoroutine(screenId, false));
     }
     IEnumerator TransitionToCoroutine(ScreenID screenId, bool hidePrevScreen = true)
     {

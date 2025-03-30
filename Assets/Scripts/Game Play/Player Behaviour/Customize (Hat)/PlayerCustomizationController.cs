@@ -1,29 +1,45 @@
 using UnityEngine;
 
-public class PlayerCustomizationController : MonoBehaviour
+public class PlayerCustomizationController : Singleton<PlayerCustomizationController>
 {
-    private Animator animator;
-    AnimatorOverrideController animatorOverrideController;
-    [SerializeField] HatCustomizeData[] datas;
+    [SerializeField] private RuntimeAnimatorController playerAnimatorController;
+    private AnimatorOverrideController animatorOverrideController;
+    public RuntimeAnimatorController PlayerAnimatorController => playerAnimatorController;
 
-    void Awake()
+    protected override void Awake()
     {
-        animator = GetComponent<Animator>();    
+        Observer.AddObserver(GameEvent.OnPlayerEquipHatItem, OnPlayerEquipHatItem);
+        base.Awake();
+        DontDestroyOnLoad(gameObject);
     }
 
+    void OnDestroy()
+    {
+        Observer.RemoveListener(GameEvent.OnPlayerEquipHatItem, OnPlayerEquipHatItem);
+    }
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.S))
         {
             
             Debug.Log("SWAP");
-            var data = datas[Random.Range(0, datas.Length)];
-            animatorOverrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
-            animator.runtimeAnimatorController = animatorOverrideController;    
-            animatorOverrideController["Hat Run"] = data.runClip;
-            animatorOverrideController["Hat Jump"] = data.jumpClip;
-            animatorOverrideController["Hat Die"] = data.dieClip;
+           
         }
+    }
+
+    void OnPlayerEquipHatItem(object[] datas)
+    {
+        HatCustomizeData data = (HatCustomizeData)datas[0];
+        SetAnimationClip(data);
+    }
+
+    public void SetAnimationClip(HatCustomizeData data)
+    {
+        animatorOverrideController = new AnimatorOverrideController(playerAnimatorController);
+        playerAnimatorController = animatorOverrideController;    
+        animatorOverrideController["Hat Run"] = data.runClip == null ? null : data.runClip;
+        animatorOverrideController["Hat Jump"] = data.jumpClip == null ? null : data.jumpClip;
+        animatorOverrideController["Hat Die"] = data.dieClip == null ? null : data.dieClip;
     }
 
 }
