@@ -31,7 +31,7 @@ public class PlayFabManager : Singleton<PlayFabManager>
         Observer.AddObserver(GameEvent.OnPlayerLogOut, OnPlayerLogOut);
         Observer.AddObserver(GameEvent.OnRecoverPassword, OnRecoverPassword);   
         Observer.AddObserver(GameEvent.OnOtherPlayerLogin, OnOtherPlayerLogin);
-        StartCoroutine(LoginAsAGuest());
+        // StartCoroutine(LoginAsAGuest());
     }
 
 
